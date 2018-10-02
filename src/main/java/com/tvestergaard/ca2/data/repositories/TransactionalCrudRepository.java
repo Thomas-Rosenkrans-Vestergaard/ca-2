@@ -11,9 +11,21 @@ public class TransactionalCrudRepository<E, ID> extends AbstractTransactionalRep
 
     private Class<E> c;
 
+    public TransactionalCrudRepository(EntityManager entityManager, Class<E> c)
+    {
+        super(entityManager);
+        this.c = c;
+    }
+
     public TransactionalCrudRepository(EntityManagerFactory entityManagerFactory, Class<E> c)
     {
         super(entityManagerFactory);
+        this.c = c;
+    }
+
+    public TransactionalCrudRepository(Class<E> c)
+    {
+        super();
         this.c = c;
     }
 

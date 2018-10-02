@@ -14,14 +14,19 @@ import java.util.List;
 public class TransactionalCompanyRepository extends TransactionalCrudRepository<Company, Integer> implements CompanyRepository
 {
 
-    /**
-     * Creates a new {@link TransactionalCompanyRepository}.
-     *
-     * @param entityManagerFactory The entity manager factory that the repository acts upon.
-     */
+    public TransactionalCompanyRepository(EntityManager entityManager)
+    {
+        super(entityManager, Company.class);
+    }
+
     public TransactionalCompanyRepository(EntityManagerFactory entityManagerFactory)
     {
         super(entityManagerFactory, Company.class);
+    }
+
+    public TransactionalCompanyRepository()
+    {
+        super(Company.class);
     }
 
     @Override public Company withPhoneNumber(String phoneNumber)

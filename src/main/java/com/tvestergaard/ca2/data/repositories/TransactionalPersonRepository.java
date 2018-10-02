@@ -14,14 +14,19 @@ import java.util.List;
 public class TransactionalPersonRepository extends TransactionalCrudRepository<Person, Integer> implements PersonRepository
 {
 
-    /**
-     * Creates a new {@link TransactionalPersonRepository}.
-     *
-     * @param entityManagerFactory The entity manager factory that the repository acts upon.
-     */
+    public TransactionalPersonRepository(EntityManager entityManager)
+    {
+        super(entityManager, Person.class);
+    }
+
     public TransactionalPersonRepository(EntityManagerFactory entityManagerFactory)
     {
         super(entityManagerFactory, Person.class);
+    }
+
+    public TransactionalPersonRepository()
+    {
+        super(Person.class);
     }
 
     @Override public Person create(String firstName, String lastName, String email)

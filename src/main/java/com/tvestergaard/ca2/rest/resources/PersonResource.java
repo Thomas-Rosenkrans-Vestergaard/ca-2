@@ -7,6 +7,7 @@ import com.tvestergaard.ca2.data.entities.Person;
 import com.tvestergaard.ca2.data.repositories.TransactionalPersonRepository;
 import com.tvestergaard.ca2.rest.dto.PersonDTO;
 
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -17,9 +18,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class PersonResource
 {
 
-    private static final TransactionalPersonRepository repository = new TransactionalPersonRepository(
-            Persistence.createEntityManagerFactory("ca2-rest-pu")
-    );
+    private static final EntityManagerFactory          emf        = Persistence.createEntityManagerFactory("ca2-rest-pu");
+    private static final TransactionalPersonRepository repository = new TransactionalPersonRepository(emf);
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -51,15 +51,21 @@ public class PersonResource
     @Produces(APPLICATION_JSON)
     public Response post(String received) throws Exception
     {
-        ReceivedPerson receivedPerson = gson.fromJson(received, ReceivedPerson.class);
-        Person person = repository.commit(() -> {
-            return repository.create(receivedPerson.firstName, receivedPerson.lastName, receivedPerson.email);
-        });
-        PersonDTO personDTO = new PersonDTO(person, true, true);
+        ReceivedPerson                receivedPerson = gson.fromJson(received, ReceivedPerson.class);
+        TransactionalPersonRepository repository     = new TransactionalPersonRepository(emf);
+        try {
+            repository.begin();
+            Person person = repository.create(receivedPerson.firstName, receivedPerson.lastName, receivedPerson.email);
+            repository.commit();
 
-        return Response.status(201)
-                       .entity(gson.toJson(personDTO))
-                       .build();
+            PersonDTO personDTO = new PersonDTO(person, true, true);
+
+            return Response.status(201)
+                           .entity(gson.toJson(personDTO))
+                           .build();
+        } finally {
+            repository.close();
+        }
     }
 
     private class ReceivedPerson
@@ -75,15 +81,22 @@ public class PersonResource
     @Produces(APPLICATION_JSON)
     public Response put(@PathParam("id") int id, String received) throws Exception
     {
-        ReceivedPerson receivedPerson = gson.fromJson(received, ReceivedPerson.class);
-        Person person = repository.commit(() -> {
-            return repository.update(id, receivedPerson.firstName, receivedPerson.lastName, receivedPerson.email);
-        });
-        PersonDTO personDTO = new PersonDTO(person, true, true);
+        ReceivedPerson                receivedPerson = gson.fromJson(received, ReceivedPerson.class);
+        TransactionalPersonRepository repository     = new TransactionalPersonRepository(emf);
+        try {
+            repository.begin();
+            Person person = repository.update(id, receivedPerson.firstName, receivedPerson.lastName, receivedPerson.email);
+            if (person == null)
+                throw new PersonNotFoundException(id);
+            repository.commit();
+            PersonDTO personDTO = new PersonDTO(person, true, true);
 
-        return Response.status(201)
-                       .entity(gson.toJson(personDTO))
-                       .build();
+            return Response.status(201)
+                           .entity(gson.toJson(personDTO))
+                           .build();
+        } finally {
+            repository.close();
+        }
     }
 
     @GET
