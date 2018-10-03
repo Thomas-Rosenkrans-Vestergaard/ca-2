@@ -1,20 +1,17 @@
 package com.tvestergaard.ca2.rest.exceptions;
 
-import java.util.ArrayList;
+import net.sf.oval.ConstraintViolation;
+
 import java.util.List;
 
 public class ValidationException extends APIException
 {
 
-    public final List<String> validationErrors = new ArrayList<>();
+    public final List<ConstraintViolation> constraintViolations;
 
-    public ValidationException(String message, int responseCode)
+    public ValidationException(String message, List<ConstraintViolation> constraintViolations)
     {
-        super(message, responseCode);
-    }
-
-    public ValidationException(String message, Throwable cause, int responseCode)
-    {
-        super(message, cause, responseCode);
+        super(message, 422);
+        this.constraintViolations = constraintViolations;
     }
 }

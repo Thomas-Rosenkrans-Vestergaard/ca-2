@@ -7,11 +7,16 @@ import com.tvestergaard.ca2.data.entities.Person;
 import com.tvestergaard.ca2.data.repositories.TransactionalPersonRepository;
 import com.tvestergaard.ca2.rest.dto.ContactDTO;
 import com.tvestergaard.ca2.rest.dto.PersonDTO;
+import com.tvestergaard.ca2.rest.exceptions.ValidationException;
+import net.sf.oval.ConstraintViolation;
+import net.sf.oval.Validator;
+import net.sf.oval.constraint.*;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -77,8 +82,13 @@ public class PersonResource
     @Produces(APPLICATION_JSON)
     public Response post(String received) throws Exception
     {
-        ReceivedPerson                receivedPerson = gson.fromJson(received, ReceivedPerson.class);
-        TransactionalPersonRepository repository     = new TransactionalPersonRepository(emf);
+        ReceivedPerson            receivedPerson       = gson.fromJson(received, ReceivedPerson.class);
+        Validator                 validator            = new Validator();
+        List<ConstraintViolation> constraintViolations = validator.validate(receivedPerson);
+        if (!constraintViolations.isEmpty())
+            throw new ValidationException("Could not validate submitted person.", constraintViolations);
+
+        TransactionalPersonRepository repository = new TransactionalPersonRepository(emf);
         try {
             repository.begin();
             Person person = repository.create(receivedPerson.firstName, receivedPerson.lastName, receivedPerson.email);
@@ -94,11 +104,56 @@ public class PersonResource
         }
     }
 
-    private class ReceivedPerson
+    private static class ReceivedPerson
     {
+
+        @NotNull
+        @Length(min = 1, max = 255)
         public String firstName;
+
+        @NotNull
+        @Length(min = 1, max = 255)
         public String lastName;
+
+        @NotNull
+        @Length(min = 1, max = 255)
+        @Email
         public String email;
+
+        @AssertValid
+        @NotNull
+        public ReceivedAddress address;
+
+        @AssertValid
+        @NotNull
+        public List<ReceivedPhone> phones;
+    }
+
+    private static class ReceivedAddress
+    {
+
+        @NotNull
+        @Length(min = 1, max = 255)
+        public String street;
+
+        @NotNull
+        @Length(min = 1, max = 255)
+        public String information;
+
+        @Size(min = 1)
+        public int city;
+    }
+
+    private static class ReceivedPhone
+    {
+
+        @NotNull
+        @Length(min = 1, max = 255)
+        public String number;
+
+        @NotNull
+        @Length(min = 1, max = 255)
+        public String description;
     }
 
     @PUT
