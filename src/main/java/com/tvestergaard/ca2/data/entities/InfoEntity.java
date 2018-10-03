@@ -13,7 +13,7 @@ public abstract class InfoEntity
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
-    @Column(length = 255, nullable = false)
+    @Column(length = 255, nullable = false, unique = true)
     private String email;
 
     @OneToMany(mappedBy = "owner")

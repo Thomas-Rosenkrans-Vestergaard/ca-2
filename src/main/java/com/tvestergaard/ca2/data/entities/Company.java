@@ -11,13 +11,13 @@ public class Company extends InfoEntity
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(length = 255, nullable = false)
+    @Column(length = 255, nullable = false, unique = true)
     private String name;
 
     @Column(length = 255, nullable = false)
     private String description;
 
-    @Column(length = 255, nullable = false)
+    @Column(length = 255, nullable = false, unique = true)
     private String cvr;
 
     @Column(nullable = false)
