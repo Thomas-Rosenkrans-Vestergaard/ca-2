@@ -36,18 +36,18 @@ public class TransactionalCityRepositoryTest
         List<String> result = instance.getZipCodes();
 
         assertEquals(9, result.size());
-        assertEquals("1111", result.get(0));
-        assertEquals("9999", result.get(8));
+        assertEquals("zip1", result.get(0));
+        assertEquals("zip9", result.get(8));
     }
 
     @Test
     public void withZipCode()
     {
-        City city = instance.withZipCode("5555");
+        City city = instance.withZipCode("zip5");
 
         assertEquals(5, (int) city.getId());
-        assertEquals("E", city.getName());
-        assertEquals("5555", city.getZipCode());
+        assertEquals("city5", city.getName());
+        assertEquals("zip5", city.getZipCode());
     }
 
     @Test
@@ -62,8 +62,8 @@ public class TransactionalCityRepositoryTest
         List<City> result = instance.get();
 
         assertEquals(9, result.size());
-        assertEquals("1111", result.get(0).getZipCode());
-        assertEquals("9999", result.get(8).getZipCode());
+        assertEquals("zip1", result.get(0).getZipCode());
+        assertEquals("zip9", result.get(8).getZipCode());
     }
 
     @Test
@@ -72,8 +72,8 @@ public class TransactionalCityRepositoryTest
         City cityA = instance.get(1);
 
         assertEquals(1, (int) cityA.getId());
-        assertEquals("A", cityA.getName());
-        assertEquals("1111", cityA.getZipCode());
+        assertEquals("city1", cityA.getName());
+        assertEquals("zip1", cityA.getZipCode());
     }
 
     @Test

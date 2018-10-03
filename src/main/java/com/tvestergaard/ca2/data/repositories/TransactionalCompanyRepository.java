@@ -34,7 +34,9 @@ public class TransactionalCompanyRepository extends TransactionalCrudRepository<
         EntityManager entityManager = getEntityManager();
 
         try {
-            return entityManager.createQuery("SELECT p.owner FROM Phone p WHERE p.number = :phoneNumber", Company.class)
+            return entityManager.createQuery(
+                    "SELECT c FROM Company c INNER JOIN Phone p ON c.id = p.owner.id WHERE p.number = :phoneNumber",
+                    Company.class)
                                 .setParameter("phoneNumber", phoneNumber)
                                 .getSingleResult();
         } catch (NoResultException e) {
