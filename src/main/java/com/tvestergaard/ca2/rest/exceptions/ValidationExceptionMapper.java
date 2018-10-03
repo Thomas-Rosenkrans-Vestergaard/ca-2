@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import net.sf.oval.ConstraintViolation;
+import net.sf.oval.context.FieldContext;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;
@@ -53,6 +54,7 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
     {
         public String     message;
         public String     checkName;
+        public String     attribute;
         public String     invalidValue;
         public JsonObject variables;
 
@@ -62,6 +64,8 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
 
             this.message = constraintViolation.getMessage();
             this.checkName = checkName.substring(checkName.lastIndexOf(".") + 1);
+            if (constraintViolation.getContext() instanceof FieldContext)
+                attribute = ((FieldContext) constraintViolation.getContext()).getField().getName();
             try {
                 this.invalidValue = String.valueOf(constraintViolation.getInvalidValue());
             } catch (Exception e) {
