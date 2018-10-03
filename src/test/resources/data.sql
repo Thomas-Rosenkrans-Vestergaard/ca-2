@@ -10,4 +10,4 @@ INSERT INTO phone (id, description, `number`, owner_id)VALUES (1, "description1"
 
 INSERT INTO hobby (id, `name`, description) VALUES (1, "name1", "description1"),(2, "name2", "description2"),(3, "name3", "description3"),(4, "name4", "description4"),(5, "name5", "description5");
 
-INSERT INTO hobby_person (hobbies_id, persons_id) VALUES (1, 1),(2, 2),(3, 3),(4, 4),(5, 5);
+INSERT INTO hobby_person (hobbies_id, persons_id) VALUES (1, 1),(2, 2),(3, 3),(4, 4),(4,5),(5, 5);

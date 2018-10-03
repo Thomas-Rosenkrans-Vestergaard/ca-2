@@ -45,7 +45,7 @@ public class TransactionalPersonRepository extends TransactionalCrudRepository<P
         person.setFirstName(firstName);
         person.setLastName(lastName);
         person.setEmail(email);
-        entityManager.getTransaction().commit();
+        entityManager.merge(person);
 
         return person;
     }
@@ -55,7 +55,9 @@ public class TransactionalPersonRepository extends TransactionalCrudRepository<P
         EntityManager entityManager = getEntityManager();
 
         try {
-            return entityManager.createQuery("SELECT p.owner FROM Phone p WHERE p.number = :phone", Person.class)
+            return entityManager.createQuery(
+                    "SELECT c FROM Person c INNER JOIN Phone p ON c.id = p.owner.id WHERE p.number = :phone",
+                    Person.class)
                                 .setParameter("phone", phoneNumber)
                                 .getSingleResult();
         } catch (NoResultException e) {
@@ -67,7 +69,8 @@ public class TransactionalPersonRepository extends TransactionalCrudRepository<P
     {
         EntityManager entityManager = getEntityManager();
 
-        return entityManager.createQuery("SELECT h.persons FROM Hobby h WHERE h.name = :hobbyName", Person.class)
+        return entityManager.createQuery("SELECT elements(h.persons) FROM Hobby h WHERE h.name = :hobbyName",
+                Person.class)
                             .setParameter("hobbyName", hobbyName)
                             .getResultList();
     }
@@ -76,7 +79,7 @@ public class TransactionalPersonRepository extends TransactionalCrudRepository<P
     {
         EntityManager entityManager = getEntityManager();
 
-        return entityManager.createQuery("SELECT h.persons FROM Hobby h WHERE h.id = :hobbyId", Person.class)
+        return entityManager.createQuery("SELECT elements(h.persons) FROM Hobby h WHERE h.id = :hobbyId", Person.class)
                             .setParameter("hobbyId", hobbyId)
                             .getResultList();
     }
@@ -84,17 +87,17 @@ public class TransactionalPersonRepository extends TransactionalCrudRepository<P
     @Override public int countWithHobby(Integer hobbyId)
     {
         return getEntityManager()
-                .createQuery("SELECT h.persons.size FROM Hobby h WHERE h.id = :id")
+                .createQuery("SELECT size(h.persons) FROM Hobby h WHERE h.id = :id", Integer.class)
                 .setParameter("id", hobbyId)
-                .getFirstResult();
+                .getSingleResult();
     }
 
     @Override public int countWithHobby(String hobbyName)
     {
         return getEntityManager()
-                .createQuery("SELECT h.persons.size FROM Hobby h WHERE h.name = :name")
+                .createQuery("SELECT size(h.persons) FROM Hobby h WHERE h.name = :name", Integer.class)
                 .setParameter("name", hobbyName)
-                .getFirstResult();
+                .getSingleResult();
     }
 
     @Override public List<Person> inCity(City city)

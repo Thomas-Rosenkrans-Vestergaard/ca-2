@@ -53,4 +53,14 @@ public class Person extends InfoEntity
         this.lastName = lastName;
         return this;
     }
+
+    public List<Hobby> getHobbies()
+    {
+        return this.hobbies;
+    }
+
+    public void setHobbies(List<Hobby> hobbies)
+    {
+        this.hobbies = hobbies;
+    }
 }
