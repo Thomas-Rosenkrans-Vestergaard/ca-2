@@ -67,6 +67,12 @@ public class TransactionalCityRepositoryTest
     }
 
     @Test
+    public void count()
+    {
+        assertEquals(9, instance.count());
+    }
+
+    @Test
     public void getId()
     {
         City cityA = instance.get(1);

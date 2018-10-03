@@ -147,6 +147,12 @@ public class TransactionalPersonRepositoryTest
     }
 
     @Test
+    public void count()
+    {
+        assertEquals(5, instance.count());
+    }
+
+    @Test
     public void getById()
     {
         Person person = instance.get(3);

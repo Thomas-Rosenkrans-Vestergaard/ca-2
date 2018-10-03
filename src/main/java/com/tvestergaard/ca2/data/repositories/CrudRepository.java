@@ -10,7 +10,14 @@ public interface CrudRepository<E, ID>
      *
      * @return All the entities in the repository.
      */
-    public List<E> get();
+    List<E> get();
+
+    /**
+     * Returns the number of defined entities.
+     *
+     * @return The number of defined entities.
+     */
+    long count();
 
     /**
      * Returns the entity with the provided id.
@@ -18,7 +25,7 @@ public interface CrudRepository<E, ID>
      * @param id The id of the entity to return.
      * @return The entity with the provided id, or {@code null} when no such entity exsits.
      */
-    public E get(ID id);
+    E get(ID id);
 
     /**
      * Persists the provided entity.

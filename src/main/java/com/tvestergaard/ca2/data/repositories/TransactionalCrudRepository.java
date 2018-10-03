@@ -37,6 +37,14 @@ public class TransactionalCrudRepository<E, ID> extends AbstractTransactionalRep
                             .getResultList();
     }
 
+    @Override public long count()
+    {
+        EntityManager entityManager = getEntityManager();
+
+        return entityManager.createQuery("SELECT count(e) FROM " + c.getSimpleName() + " e", Long.class)
+                            .getSingleResult();
+    }
+
     public E get(ID id)
     {
         EntityManager entityManager = getEntityManager();

@@ -24,10 +24,11 @@ public class Address
 
     }
 
-    public Address(String street, String information)
+    public Address(String street, String information, City city)
     {
         this.street = street;
         this.information = information;
+        this.city = city;
     }
 
     public Integer getId()

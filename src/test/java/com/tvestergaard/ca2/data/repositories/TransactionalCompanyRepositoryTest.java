@@ -82,6 +82,12 @@ public class TransactionalCompanyRepositoryTest
     }
 
     @Test
+    public void count()
+    {
+        assertEquals(5, instance.count());
+    }
+
+    @Test
     public void getById()
     {
         Company company1 = instance.get(6);
