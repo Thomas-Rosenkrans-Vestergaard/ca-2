@@ -3,6 +3,7 @@ package com.tvestergaard.ca2.rest.exceptions;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import net.sf.oval.ConstraintViolation;
 
 import javax.servlet.ServletContext;
@@ -10,8 +11,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Provider
 public class ValidationExceptionMapper implements ExceptionMapper<ValidationException>
@@ -48,9 +51,10 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
 
     private class ConstraintViolationDTO
     {
-        public String message;
-        public String checkName;
-        public String invalidValue;
+        public String     message;
+        public String     checkName;
+        public String     invalidValue;
+        public JsonObject variables;
 
         public ConstraintViolationDTO(ConstraintViolation constraintViolation)
         {
@@ -62,6 +66,22 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
                 this.invalidValue = String.valueOf(constraintViolation.getInvalidValue());
             } catch (Exception e) {
                 this.invalidValue = "// Could not serialize value.";
+            }
+
+            Map<String, ? extends Serializable> variables = constraintViolation.getMessageVariables();
+            if (variables != null && !variables.isEmpty()) {
+                this.variables = new JsonObject();
+                for (Map.Entry<String, ? extends Serializable> entry : variables.entrySet()) {
+                    String key = entry.getKey();
+                    Object val = entry.getValue();
+
+                    if (val instanceof String)
+                        this.variables.addProperty(key, (String) val);
+                    else if (val instanceof Number)
+                        this.variables.addProperty(key, (Number) val);
+                    else if (val instanceof Boolean)
+                        this.variables.addProperty(key, (Boolean) val);
+                }
             }
         }
     }
