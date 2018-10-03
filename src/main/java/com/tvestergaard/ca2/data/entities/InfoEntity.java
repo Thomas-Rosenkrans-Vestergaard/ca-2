@@ -10,7 +10,7 @@ public abstract class InfoEntity
 {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
     @Column(length = 255, nullable = false)

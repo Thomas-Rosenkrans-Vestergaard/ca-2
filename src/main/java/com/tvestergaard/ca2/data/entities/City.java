@@ -1,6 +1,7 @@
 package com.tvestergaard.ca2.data.entities;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class City
@@ -58,5 +59,29 @@ public class City
     {
         this.name = city;
         return this;
+    }
+
+    @Override public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (!(o instanceof City)) return false;
+        City city = (City) o;
+        return Objects.equals(getId(), city.getId()) &&
+                Objects.equals(getZipCode(), city.getZipCode()) &&
+                Objects.equals(getName(), city.getName());
+    }
+
+    @Override public int hashCode()
+    {
+        return Objects.hash(getId(), getZipCode(), getName());
+    }
+
+    @Override public String toString()
+    {
+        return "City{" +
+                "id=" + id +
+                ", zipCode='" + zipCode + '\'' +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

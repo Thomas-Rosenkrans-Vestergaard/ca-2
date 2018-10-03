@@ -1,15 +1,15 @@
 package com.tvestergaard.ca2.data.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Hobby
 {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(length = 255, nullable = false)
@@ -18,8 +18,8 @@ public class Hobby
     @Column(length = 255, nullable = false)
     private String description;
 
-    @ManyToOne
-    private Person person;
+    @ManyToMany
+    private List<Person> persons = new ArrayList<>();
 
     public Hobby()
     {
@@ -65,14 +65,13 @@ public class Hobby
         return this;
     }
 
-    public Person getPerson()
+    public List<Person> getPersons()
     {
-        return this.person;
+        return this.persons;
     }
 
-    public Hobby setPerson(Person person)
+    public void setPersons(List<Person> person)
     {
-        this.person = person;
-        return this;
+        this.persons = person;
     }
 }

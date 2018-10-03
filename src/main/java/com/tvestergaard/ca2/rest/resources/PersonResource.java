@@ -5,12 +5,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.tvestergaard.ca2.data.entities.Person;
 import com.tvestergaard.ca2.data.repositories.TransactionalPersonRepository;
+import com.tvestergaard.ca2.rest.dto.ContactDTO;
 import com.tvestergaard.ca2.rest.dto.PersonDTO;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -28,7 +30,17 @@ public class PersonResource
     public Response get() throws Exception
     {
         return Response.ok()
-                       .entity(gson.toJson(repository.get()))
+                       .entity(gson.toJson(repository.get().stream().map(p -> new PersonDTO(p, true, true, false)).collect(Collectors.toList())))
+                       .build();
+    }
+
+    @GET
+    @Path("contact-info")
+    @Produces(APPLICATION_JSON)
+    public Response getContactInformation() throws Exception
+    {
+        return Response.ok()
+                       .entity(gson.toJson(repository.get().stream().map(p -> new ContactDTO(p)).collect(Collectors.toList())))
                        .build();
     }
 
@@ -42,7 +54,21 @@ public class PersonResource
             throw new PersonNotFoundException(id);
 
         return Response.ok()
-                       .entity(gson.toJson(person))
+                       .entity(gson.toJson(new PersonDTO(person, true, true, false)))
+                       .build();
+    }
+
+    @GET
+    @Path("{id: [0-9]+}/contact-info")
+    @Produces(APPLICATION_JSON)
+    public Response getWithIdContactInformation(@PathParam("id") int id) throws Exception
+    {
+        Person person = repository.get(id);
+        if (person == null)
+            throw new PersonNotFoundException(id);
+
+        return Response.ok()
+                       .entity(gson.toJson(new ContactDTO(person)))
                        .build();
     }
 
@@ -58,7 +84,7 @@ public class PersonResource
             Person person = repository.create(receivedPerson.firstName, receivedPerson.lastName, receivedPerson.email);
             repository.commit();
 
-            PersonDTO personDTO = new PersonDTO(person, true, true);
+            PersonDTO personDTO = new PersonDTO(person, true, true, false);
 
             return Response.status(201)
                            .entity(gson.toJson(personDTO))
@@ -89,7 +115,7 @@ public class PersonResource
             if (person == null)
                 throw new PersonNotFoundException(id);
             repository.commit();
-            PersonDTO personDTO = new PersonDTO(person, true, true);
+            PersonDTO personDTO = new PersonDTO(person, true, true, false);
 
             return Response.status(201)
                            .entity(gson.toJson(personDTO))

@@ -13,4 +13,12 @@ public interface CityRepository extends CrudRepository<City, Integer>
      * @return The list of the zip codes in the system.
      */
     List<String> getZipCodes();
+
+    /**
+     * Returns the city with the provided zip code.
+     *
+     * @param zipCode The zip code of the city to find.
+     * @return The city with the provided zip code, or {@code null} when no such city exists.
+     */
+    City withZipCode(String zipCode);
 }

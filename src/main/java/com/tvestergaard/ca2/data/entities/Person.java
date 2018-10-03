@@ -17,7 +17,7 @@ public class Person extends InfoEntity
     @Column(length = 255, nullable = false)
     private String lastName;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "person")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "persons")
     private List<Hobby> hobbies = new ArrayList<>();
 
     public Person()

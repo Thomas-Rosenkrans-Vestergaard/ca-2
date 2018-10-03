@@ -14,7 +14,7 @@ public class PersonDTO
     public List<PhoneDTO> phoneNumbers;
     public AddressDTO     address;
 
-    public PersonDTO(Person person, boolean showPhoneNumbers, boolean showAddress)
+    public PersonDTO(Person person, boolean showPhoneNumbers, boolean showAddress, boolean showHobbies)
     {
         this.id = person.getId();
         this.firstName = person.getFirstName();
