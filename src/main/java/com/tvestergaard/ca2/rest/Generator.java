@@ -12,7 +12,7 @@ public class Generator
 
     public static void main(String[] args) throws IOException
     {
-        generate(1000);
+        generate(10);
     }
 
     public static void generate(int samples) throws IOException

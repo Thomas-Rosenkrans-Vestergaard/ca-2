@@ -35,8 +35,13 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
         exceptionResponse.message = exception.getMessage();
         exceptionResponse.responseCode = exception.getResponseCode();
         exceptionResponse.debug = isDebug;
-        for (ConstraintViolation constraintViolation : exception.constraintViolations)
-            exceptionResponse.violations.add(new ConstraintViolationDTO(constraintViolation));
+        for (ConstraintViolation constraintViolation : exception.constraintViolations) {
+            if (constraintViolation.getCauses() != null) {
+                for (ConstraintViolation cause : constraintViolation.getCauses())
+                    exceptionResponse.violations.add(new ConstraintViolationDTO(cause));
+            } else
+                exceptionResponse.violations.add(new ConstraintViolationDTO(constraintViolation));
+        }
 
         return Response.status(exception.getResponseCode()).entity(gson.toJson(exceptionResponse)).build();
     }
@@ -60,6 +65,7 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
 
         public ConstraintViolationDTO(ConstraintViolation constraintViolation)
         {
+
             String checkName = constraintViolation.getCheckName();
 
             this.message = constraintViolation.getMessage();

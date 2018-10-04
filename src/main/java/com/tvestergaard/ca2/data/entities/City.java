@@ -14,7 +14,7 @@ public class City
     @Column(length = 10, nullable = false, unique = true)
     private String zipCode;
 
-    @Column(length = 50, nullable = false, unique = true)
+    @Column(length = 50, nullable = false)
     private String name;
 
     public City()
