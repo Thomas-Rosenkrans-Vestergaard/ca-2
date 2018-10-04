@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.persistence.EntityManagerFactory;
+import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.*;
@@ -34,7 +35,9 @@ public class TransactionalPersonRepositoryTest
     @Test
     public void create()
     {
-        Person person = instance.create("a", "b", "c");
+
+        AddressRepository addressRepository = new TransactionalAddressRepository(instance.getEntityManager());
+        Person            person            = instance.create("a", "b", "c", addressRepository.get(3), new ArrayList<>());
 
         assertNotNull(person.getId());
         assertEquals("a", person.getFirstName());
@@ -42,12 +45,14 @@ public class TransactionalPersonRepositoryTest
         assertEquals("c", person.getEmail());
         assertEquals(0, person.getPhoneNumbers().size());
         assertEquals(0, person.getHobbies().size());
+        assertEquals("street3", person.getAddress().getStreet());
     }
 
     @Test
     public void update()
     {
-        Person person = instance.create("a", "b", "c");
+        AddressRepository addressRepository = new TransactionalAddressRepository(instance.getEntityManager());
+        Person            person            = instance.create("a", "b", "c", addressRepository.get(3), new ArrayList<>());
 
         Person updated = instance.update(person.getId(), "d", "e", "f");
 
@@ -56,6 +61,9 @@ public class TransactionalPersonRepositoryTest
         assertEquals("d", updated.getFirstName());
         assertEquals("e", updated.getLastName());
         assertEquals("f", updated.getEmail());
+        assertEquals(0, updated.getHobbies().size());
+        assertEquals(0, updated.getPhoneNumbers().size());
+        assertEquals("street3", updated.getAddress().getStreet());
     }
 
     @Test
@@ -183,7 +191,9 @@ public class TransactionalPersonRepositoryTest
     @Test
     public void updateEntity()
     {
-        Person person = instance.create("a", "b", "c");
+
+        AddressRepository addressRepository = new TransactionalAddressRepository(instance.getEntityManager());
+        Person            person            = instance.create("a", "b", "c", addressRepository.get(3), new ArrayList<>());
 
         person.setFirstName("d");
         person.setLastName("e");
@@ -196,6 +206,9 @@ public class TransactionalPersonRepositoryTest
         assertEquals("d", updated.getFirstName());
         assertEquals("e", updated.getLastName());
         assertEquals("f", updated.getEmail());
+        assertEquals(0, updated.getPhoneNumbers().size());
+        assertEquals(0, updated.getHobbies().size());
+        assertEquals("street3", updated.getAddress().getStreet());
     }
 
     @Test
