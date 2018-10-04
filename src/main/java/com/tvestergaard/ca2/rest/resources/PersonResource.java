@@ -3,7 +3,12 @@ package com.tvestergaard.ca2.rest.resources;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.tvestergaard.ca2.data.entities.Address;
+import com.tvestergaard.ca2.data.entities.City;
 import com.tvestergaard.ca2.data.entities.Person;
+import com.tvestergaard.ca2.data.entities.Phone;
+import com.tvestergaard.ca2.data.repositories.TransactionalAddressRepository;
+import com.tvestergaard.ca2.data.repositories.TransactionalCityRepository;
 import com.tvestergaard.ca2.data.repositories.TransactionalPersonRepository;
 import com.tvestergaard.ca2.rest.dto.ContactDTO;
 import com.tvestergaard.ca2.rest.dto.PersonDTO;
@@ -14,8 +19,10 @@ import net.sf.oval.constraint.*;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -88,10 +95,23 @@ public class PersonResource
         if (!constraintViolations.isEmpty())
             throw new ValidationException("Could not validate submitted person.", constraintViolations);
 
-        TransactionalPersonRepository repository = new TransactionalPersonRepository(emf);
+        TransactionalPersonRepository  repository        = new TransactionalPersonRepository(emf);
+        TransactionalAddressRepository addressRepository = new TransactionalAddressRepository(repository.getEntityManager());
+        TransactionalCityRepository    cityRepository    = new TransactionalCityRepository(repository.getEntityManager());
         try {
             repository.begin();
-            Person person = repository.create(receivedPerson.firstName, receivedPerson.lastName, receivedPerson.email);
+            City city = cityRepository.get(receivedPerson.address.city);
+            if (city == null)
+                throw new CityNotFoundException(receivedPerson.address.city);
+            Address address = addressRepository.getOrCreate(receivedPerson.address.street,
+                                                            receivedPerson.address.information,
+                                                            city);
+            List<Phone> phoneNumbers = new ArrayList<>();
+            for (ReceivedPhone receivedPhone : receivedPerson.phones)
+                phoneNumbers.add(new Phone(receivedPhone.number, receivedPhone.description));
+            Person person = repository.create(receivedPerson.firstName, receivedPerson.lastName, receivedPerson.email,
+                                              address,
+                                              phoneNumbers);
             repository.commit();
 
             PersonDTO personDTO = new PersonDTO(person, true, true, false);
@@ -99,6 +119,9 @@ public class PersonResource
             return Response.status(201)
                            .entity(gson.toJson(personDTO))
                            .build();
+        } catch (PersistenceException e) {
+            repository.rollback();
+            throw e;
         } finally {
             repository.close();
         }

@@ -1,7 +1,9 @@
 package com.tvestergaard.ca2.data.repositories;
 
+import com.tvestergaard.ca2.data.entities.Address;
 import com.tvestergaard.ca2.data.entities.City;
 import com.tvestergaard.ca2.data.entities.Person;
+import com.tvestergaard.ca2.data.entities.Phone;
 
 import java.util.List;
 
@@ -14,9 +16,11 @@ public interface PersonRepository extends CrudRepository<Person, Integer>
      * @param firstName The first name of the person to create.
      * @param lastName  The last name of the person to create.
      * @param email     The email address of the person to create.
+     * @param address   The address of the person to create.
+     * @param phones    The phone numbers of the person to create.
      * @return The created person.
      */
-    Person create(String firstName, String lastName, String email);
+    Person create(String firstName, String lastName, String email, Address address, List<Phone> phones);
 
     /**
      * Updates the person with the provided id to the provided values.

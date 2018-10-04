@@ -16,10 +16,10 @@ public abstract class InfoEntity
     @Column(length = 255, nullable = false, unique = true)
     private String email;
 
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Phone> phoneNumbers = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Address address;
 
     public InfoEntity()

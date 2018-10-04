@@ -1,7 +1,9 @@
 package com.tvestergaard.ca2.data.repositories;
 
+import com.tvestergaard.ca2.data.entities.Address;
 import com.tvestergaard.ca2.data.entities.City;
 import com.tvestergaard.ca2.data.entities.Person;
+import com.tvestergaard.ca2.data.entities.Phone;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -29,9 +31,11 @@ public class TransactionalPersonRepository extends TransactionalCrudRepository<P
         super(Person.class);
     }
 
-    @Override public Person create(String firstName, String lastName, String email)
+    @Override public Person create(String firstName, String lastName, String email, Address address, List<Phone> phones)
     {
         Person person = new Person(firstName, lastName, email);
+        person.setAddress(address);
+        person.setPhoneNumbers(phones);
         return persist(person);
     }
 
@@ -70,7 +74,7 @@ public class TransactionalPersonRepository extends TransactionalCrudRepository<P
         EntityManager entityManager = getEntityManager();
 
         return entityManager.createQuery("SELECT elements(h.persons) FROM Hobby h WHERE h.name = :hobbyName",
-                Person.class)
+                                         Person.class)
                             .setParameter("hobbyName", hobbyName)
                             .getResultList();
     }
