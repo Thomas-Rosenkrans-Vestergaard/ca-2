@@ -3,6 +3,9 @@ package com.tvestergaard.ca2.data.entities;
 import javax.persistence.*;
 
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"street", "information", "city_id"})
+})
 public class Address
 {
 
