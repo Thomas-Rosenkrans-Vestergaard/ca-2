@@ -47,6 +47,19 @@ public class PersonResource
     }
 
     @GET
+    @Path("paginated/{pageSize: [0-9]+}/{pageNumber: [0-9]+}")
+    @Produces(APPLICATION_JSON)
+    public Response getPagination(@PathParam("pageSize") int pageSize, @PathParam("pageNumber") int pageNumber) throws Exception
+    {
+        return Response.ok()
+                       .entity(gson.toJson(repository.get(pageSize, pageNumber)
+                                                     .stream()
+                                                     .map(p -> new PersonDTO(p, true, true, false))
+                                                     .collect(Collectors.toList())))
+                       .build();
+    }
+
+    @GET
     @Path("contact-info")
     @Produces(APPLICATION_JSON)
     public Response getContactInformation() throws Exception
@@ -104,14 +117,14 @@ public class PersonResource
             if (city == null)
                 throw new CityNotFoundException(postedPerson.address.city);
             Address address = addressRepository.getOrCreate(postedPerson.address.street,
-                                                            postedPerson.address.information,
-                                                            city);
+                    postedPerson.address.information,
+                    city);
             List<Phone> phoneNumbers = new ArrayList<>();
             for (PostPhone postPhone : postedPerson.phones)
                 phoneNumbers.add(new Phone(postPhone.number, postPhone.description));
             Person person = repository.create(postedPerson.firstName, postedPerson.lastName, postedPerson.email,
-                                              address,
-                                              phoneNumbers);
+                    address,
+                    phoneNumbers);
             repository.commit();
 
             PersonDTO personDTO = new PersonDTO(person, true, true, false);
@@ -220,14 +233,14 @@ public class PersonResource
             if (city == null)
                 throw new CityNotFoundException(putPerson.address.city);
             Address address = addressRepository.getOrCreate(putPerson.address.street,
-                                                            putPerson.address.information,
-                                                            city);
+                    putPerson.address.information,
+                    city);
             List<Phone> phoneNumbers = new ArrayList<>();
             for (PutPhone putPhone : putPerson.phones)
                 phoneNumbers.add(new Phone(putPhone.number, putPhone.description));
             Person person = repository.update(id, putPerson.firstName, putPerson.lastName, putPerson.email,
-                                              address,
-                                              phoneNumbers);
+                    address,
+                    phoneNumbers);
             repository.commit();
 
             PersonDTO personDTO = new PersonDTO(person, true, true, false);
@@ -261,7 +274,7 @@ public class PersonResource
         List<PersonDTO> results = repository.withName(
                 first.isEmpty() ? null : first,
                 last.isEmpty() ? null : last
-        ).stream().map(p -> new PersonDTO(p, true, true, false)).collect(Collectors.toList());
+                                                     ).stream().map(p -> new PersonDTO(p, true, true, false)).collect(Collectors.toList());
 
         return Response.ok()
                        .entity(gson.toJson(results))

@@ -13,6 +13,16 @@ public interface CrudRepository<E, ID>
     List<E> get();
 
     /**
+     * Returns a *page* of entities in the repository. The entities retrieved, in a zero-based manor, are defined
+     * from <code> (pageNumber - 1) * pageSize</code> to <code>(pageSize) * perPage</code>.
+     *
+     * @param pageSize    The number of entities per page.
+     * @param pageNumber The page number to get. Starts at 1.
+     * @return
+     */
+    List<E> get(int pageSize, int pageNumber);
+
+    /**
      * Returns the number of defined entities.
      *
      * @return The number of defined entities.
