@@ -313,6 +313,25 @@ public class PersonResource
                        .build();
     }
 
+    @DELETE
+    @Path("{id: [0-9]+}")
+    @Produces(APPLICATION_JSON)
+    public Response delete(@PathParam("id") int id) throws Exception
+    {
+        TransactionalPersonRepository personRepository = new TransactionalPersonRepository(emf);
+        try {
+            personRepository.begin();
+            Person person = personRepository.delete(id);
+            personRepository.commit();
+            if (person == null)
+                throw new PersonNotFoundException(id);
+
+            return Response.ok(gson.toJson(new PersonDTO(person, true, true, false))).build();
+        } finally {
+            personRepository.close();
+        }
+    }
+
     private static JsonObject count(int count)
     {
         JsonObject o = new JsonObject();
