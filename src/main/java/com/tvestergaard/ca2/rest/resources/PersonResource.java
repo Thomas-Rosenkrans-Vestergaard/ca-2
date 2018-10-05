@@ -60,6 +60,16 @@ public class PersonResource
     }
 
     @GET
+    @Path("count")
+    @Produces(APPLICATION_JSON)
+    public Response count()
+    {
+        return Response.ok()
+                       .entity(gson.toJson(count(repository.count())))
+                       .build();
+    }
+
+    @GET
     @Path("contact-info")
     @Produces(APPLICATION_JSON)
     public Response getContactInformation() throws Exception
@@ -360,7 +370,7 @@ public class PersonResource
         }
     }
 
-    private static JsonObject count(int count)
+    private static JsonObject count(long count)
     {
         JsonObject o = new JsonObject();
         o.addProperty("count", count);

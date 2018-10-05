@@ -4,7 +4,6 @@ import com.tvestergaard.ca2.data.repositories.transactions.AbstractTransactional
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.TypedQuery;
 import java.util.List;
 
 public class TransactionalCrudRepository<E, ID> extends AbstractTransactionalRepository implements CrudRepository<E, ID>
@@ -40,10 +39,10 @@ public class TransactionalCrudRepository<E, ID> extends AbstractTransactionalRep
 
     @Override public List<E> get(int pageSize, int pageNumber)
     {
-        TypedQuery<E> query = getEntityManager().createQuery("From " + c.getSimpleName(), c);
-        query.setFirstResult((pageNumber - 1) * pageSize);
-        query.setMaxResults(pageSize);
-        return query.getResultList();
+        return getEntityManager().createQuery("SELECT e FROM " + c.getSimpleName() + " e", c)
+                                 .setFirstResult((pageNumber - 1) * pageSize)
+                                 .setMaxResults(pageSize)
+                                 .getResultList();
     }
 
     @Override public long count()
