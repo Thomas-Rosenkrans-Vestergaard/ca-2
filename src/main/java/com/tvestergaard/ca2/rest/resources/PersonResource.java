@@ -32,8 +32,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class PersonResource
 {
 
-    private static final EntityManagerFactory          emf        = Persistence.createEntityManagerFactory("ca2-rest-pu");
-    private static final TransactionalPersonRepository repository = new TransactionalPersonRepository(emf);
+    private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("ca2-rest-pu");
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -41,9 +40,10 @@ public class PersonResource
     @Produces(APPLICATION_JSON)
     public Response get() throws Exception
     {
-        return Response.ok()
-                       .entity(gson.toJson(repository.get().stream().map(p -> new PersonDTO(p, true, true, false)).collect(Collectors.toList())))
-                       .build();
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(repository.get().stream().map(p -> new PersonDTO(p, true, true, false)).collect(Collectors.toList())))
+                        .build());
     }
 
     @GET
@@ -51,22 +51,24 @@ public class PersonResource
     @Produces(APPLICATION_JSON)
     public Response getPagination(@PathParam("pageSize") int pageSize, @PathParam("pageNumber") int pageNumber) throws Exception
     {
-        return Response.ok()
-                       .entity(gson.toJson(repository.get(pageSize, pageNumber)
-                                                     .stream()
-                                                     .map(p -> new PersonDTO(p, true, true, false))
-                                                     .collect(Collectors.toList())))
-                       .build();
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(repository.get(pageSize, pageNumber)
+                                                      .stream()
+                                                      .map(p -> new PersonDTO(p, true, true, false))
+                                                      .collect(Collectors.toList())))
+                        .build());
     }
 
     @GET
     @Path("count")
     @Produces(APPLICATION_JSON)
-    public Response count()
+    public Response count() throws Exception
     {
-        return Response.ok()
-                       .entity(gson.toJson(count(repository.count())))
-                       .build();
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(count(repository.count())))
+                        .build());
     }
 
     @GET
@@ -74,9 +76,10 @@ public class PersonResource
     @Produces(APPLICATION_JSON)
     public Response getContactInformation() throws Exception
     {
-        return Response.ok()
-                       .entity(gson.toJson(repository.get().stream().map(p -> new ContactDTO(p)).collect(Collectors.toList())))
-                       .build();
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(repository.get().stream().map(p -> new ContactDTO(p)).collect(Collectors.toList())))
+                        .build());
     }
 
     @GET
@@ -84,13 +87,15 @@ public class PersonResource
     @Produces(APPLICATION_JSON)
     public Response getWithId(@PathParam("id") int id) throws Exception
     {
-        Person person = repository.get(id);
-        if (person == null)
-            throw new PersonNotFoundException(id);
+        return repository(repository -> {
+            Person person = repository.get(id);
+            if (person == null)
+                throw new PersonNotFoundException(id);
 
-        return Response.ok()
-                       .entity(gson.toJson(new PersonDTO(person, true, true, false)))
-                       .build();
+            return Response.ok()
+                           .entity(gson.toJson(new PersonDTO(person, true, true, false)))
+                           .build();
+        });
     }
 
     @GET
@@ -98,13 +103,15 @@ public class PersonResource
     @Produces(APPLICATION_JSON)
     public Response getWithIdContactInformation(@PathParam("id") int id) throws Exception
     {
-        Person person = repository.get(id);
-        if (person == null)
-            throw new PersonNotFoundException(id);
+        return repository(repository -> {
+            Person person = repository.get(id);
+            if (person == null)
+                throw new PersonNotFoundException(id);
 
-        return Response.ok()
-                       .entity(gson.toJson(new ContactDTO(person)))
-                       .build();
+            return Response.ok()
+                           .entity(gson.toJson(new ContactDTO(person)))
+                           .build();
+        });
     }
 
     @POST
@@ -269,86 +276,98 @@ public class PersonResource
     @GET
     @Path("hobby/{id: [0-9]+}")
     @Produces(APPLICATION_JSON)
-    public Response withHobbyId(@PathParam("id") int id)
+    public Response withHobbyId(@PathParam("id") int id) throws Exception
     {
-        return Response.ok()
-                       .entity(gson.toJson(repository.withHobby(id)))
-                       .build();
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(repository.withHobby(id)))
+                        .build());
     }
 
     @GET
     @Path("first/{first: .*}/last/{last: .*}")
     @Produces(APPLICATION_JSON)
-    public Response withName(@PathParam("first") String first, @PathParam("last") String last)
+    public Response withName(@PathParam("first") String first, @PathParam("last") String last) throws Exception
     {
-        List<PersonDTO> results = repository.withName(
-                first.isEmpty() ? null : first,
-                last.isEmpty() ? null : last
-                                                     ).stream().map(p -> new PersonDTO(p, true, true, false)).collect(Collectors.toList());
+        String firstName = first.isEmpty() ? null : first;
+        String lastName = last.isEmpty() ? null : last;
 
-        return Response.ok()
-                       .entity(gson.toJson(results))
-                       .build();
+        return repository(repository -> {
+            List<PersonDTO> results = repository.withName(firstName, lastName)
+                                                .stream()
+                                                .map(p -> new PersonDTO(p, true, true, false))
+                                                .collect(Collectors.toList());
+
+            return Response.ok()
+                           .entity(gson.toJson(results))
+                           .build();
+        });
     }
 
     @GET
     @Path("hobby/{name: [a-zA-Z ]+}")
     @Produces(APPLICATION_JSON)
-    public Response withHobbyName(@PathParam("name") String name)
+    public Response withHobbyName(@PathParam("name") String name) throws Exception
     {
-        return Response.ok()
-                       .entity(gson.toJson(repository.withHobby(name)))
-                       .build();
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(repository.withHobby(name)))
+                        .build());
     }
 
     @GET
     @Path("hobby/{id: [0-9]+}/count")
     @Produces(APPLICATION_JSON)
-    public Response countWithHobbyId(@PathParam("id") int id)
+    public Response countWithHobbyId(@PathParam("id") int id) throws Exception
     {
-        return Response.ok()
-                       .entity(count(repository.countWithHobby(id)).toString())
-                       .build();
+        return repository(repository ->
+                Response.ok()
+                        .entity(count(repository.countWithHobby(id)).toString())
+                        .build());
     }
 
     @GET
     @Path("hobby/{name: [a-zA-Z ]+}/count")
     @Produces(APPLICATION_JSON)
-    public Response countWithHobbyName(@PathParam("name") String name)
+    public Response countWithHobbyName(@PathParam("name") String name) throws Exception
     {
-        return Response.ok()
-                       .entity(count(repository.countWithHobby(name)).toString())
-                       .build();
+        return repository(repository ->
+                Response.ok()
+                        .entity(count(repository.countWithHobby(name)).toString())
+                        .build());
     }
 
     @GET
     @Path("zip-code/{code}")
     @Produces(APPLICATION_JSON)
-    public Response inZipCode(@PathParam("code") String code)
+    public Response inZipCode(@PathParam("code") String code) throws Exception
     {
-        return Response.ok()
-                       .entity(gson.toJson(repository.inZipCode(code)))
-                       .build();
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(repository.inZipCode(code)))
+                        .build());
     }
 
     @GET
     @Path("city/{name: [a-zA-Z ]+}")
     @Produces(APPLICATION_JSON)
-    public Response inCity(@PathParam("name") String name)
+    public Response inCity(@PathParam("name") String name) throws Exception
     {
-        return Response.ok()
-                       .entity(gson.toJson(repository.inCity("name")))
-                       .build();
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(repository.inCity("name")))
+                        .build());
     }
 
     @GET
     @Path("city/{id: [0-9]+}")
     @Produces(APPLICATION_JSON)
-    public Response inCity(@PathParam("id") int id)
+    public Response inCity(@PathParam("id") int id) throws Exception
     {
-        return Response.ok()
-                       .entity(gson.toJson(repository.inCity(id)))
-                       .build();
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(repository.inCity(id)))
+                        .build());
     }
 
     @DELETE
@@ -375,5 +394,21 @@ public class PersonResource
         JsonObject o = new JsonObject();
         o.addProperty("count", count);
         return o;
+    }
+
+    @FunctionalInterface
+    private interface ExceptionFunction
+    {
+        public Response call(TransactionalPersonRepository repository) throws Exception;
+    }
+
+    private Response repository(ExceptionFunction f) throws Exception
+    {
+        TransactionalPersonRepository repository = new TransactionalPersonRepository(emf);
+        try {
+            return f.call(repository);
+        } finally {
+            repository.close();
+        }
     }
 }
