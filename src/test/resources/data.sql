@@ -2,7 +2,7 @@ INSERT INTO city (id, name, zipCode) VALUES (1, "city1", "zip1"),(2, "city2", "z
 
 INSERT INTO address (id, information, street, city_id) VALUES (1, "information1", "street1", 1),(2, "information2", "street2", 2),(3, "information3", "street3", 3),(4, "information4", "street4", 4),(5, "information5", "street5", 5);
 
-INSERT INTO person (id, email, address_id, firstName, lastName) VALUES (1, "email1@email.com", 1, "first1", "last1"),(2, "email2@email.com", 2, "first2", "last2"),(3, "email3@email.com", 3, "first3", "last3"),(4, "email4@email.com", 4, "first4", "last4"),(5, "email5@email.com", 5, "first5", "last5");
+INSERT INTO person (id, email, address_id, firstName, lastName) VALUES (1, "email1@email.com", 1, "first1", "last1"),(2, "email2@email.com", 2, "first2", "last2"),(3, "email3@email.com", 3, "first3", "last3"),(4, "email4@email.com", 4, "first4", "last4"),(5, "email5@email.com", 5, "first5", "last5"), (6, "email@email.com", 5, "first1", "last2");
 
 INSERT INTO company (id, email, address_id, cvr, description, marketValue, name, numberOfEmployees)VALUES (6, "company1@email.com", 1, "cvr1", "description1", 1, "name1", 1),(7, "company2@email.com", 2, "cvr2", "description2", 2, "name2", 2),(8, "company3@email.com", 3, "cvr3", "description3", 3, "name3", 3),(9, "company4@email.com", 4, "cvr4", "description4", 4, "name4", 4),(10, "company5@email.com", 5, "cvr5", "description5", 5, "name5", 5);
 

@@ -254,6 +254,21 @@ public class PersonResource
     }
 
     @GET
+    @Path("first/{first}/last/{last}")
+    @Produces(APPLICATION_JSON)
+    public Response withName(@PathParam("first") String first, @PathParam("last") String last)
+    {
+        List<PersonDTO> results = repository.withName(
+                first.isEmpty() ? null : first,
+                last.isEmpty() ? null : last
+        ).stream().map(p -> new PersonDTO(p, true, true, false)).collect(Collectors.toList());
+
+        return Response.ok()
+                       .entity(gson.toJson(results))
+                       .build();
+    }
+
+    @GET
     @Path("hobby/{name: [a-zA-Z ]+}")
     @Produces(APPLICATION_JSON)
     public Response withHobbyName(@PathParam("name") String name)

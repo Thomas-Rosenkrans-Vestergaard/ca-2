@@ -36,6 +36,15 @@ public interface PersonRepository extends CrudRepository<Person, Integer>
     Person update(int id, String firstName, String lastName, String email, Address address, List<Phone> phones);
 
     /**
+     * Searches for people with the provided first and last name.
+     *
+     * @param firstName The first name to search for, when {@code null} the constraint is ignored.
+     * @param lastName  The last name to search for, when {@code null} the constraint is ignored.
+     * @return The search results.
+     */
+    List<Person> withName(String firstName, String lastName);
+
+    /**
      * Returns the person with the provided phone number.
      *
      * @param phoneNumber The phone number of the person to return.

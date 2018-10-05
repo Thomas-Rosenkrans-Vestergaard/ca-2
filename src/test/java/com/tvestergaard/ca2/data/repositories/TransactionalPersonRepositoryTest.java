@@ -54,7 +54,7 @@ public class TransactionalPersonRepositoryTest
         AddressRepository addressRepository = new TransactionalAddressRepository(instance.getEntityManager());
         Person            person            = instance.create("a", "b", "c", addressRepository.get(3), new ArrayList<>());
 
-        Person updated = instance.update(person.getId(), "d", "e", "f");
+        Person updated = instance.update(person.getId(), "d", "e", "f", addressRepository.get(3), new ArrayList<>());
 
         assertEquals(person, updated);
 
@@ -149,7 +149,7 @@ public class TransactionalPersonRepositoryTest
     {
         List<Person> persons = instance.get();
 
-        assertEquals(5, persons.size());
+        assertEquals(6, persons.size());
         assertEquals("first1", persons.get(0).getFirstName());
         assertEquals("first5", persons.get(4).getFirstName());
     }
@@ -157,7 +157,7 @@ public class TransactionalPersonRepositoryTest
     @Test
     public void count()
     {
-        assertEquals(5, instance.count());
+        assertEquals(6, instance.count());
     }
 
     @Test
@@ -226,5 +226,25 @@ public class TransactionalPersonRepositoryTest
     public void deleteReturnsNull()
     {
         assertNull(instance.delete(-1));
+    }
+
+    @Test
+    public void withName()
+    {
+        List<Person> byFirstName = instance.withName("first1", null);
+        assertEquals(2, byFirstName.size());
+        assertEquals(1, (int) byFirstName.get(0).getId());
+        assertEquals(6, (int) byFirstName.get(1).getId());
+
+        List<Person> byLastName = instance.withName(null, "last3");
+        assertEquals(1, byLastName.size());
+        assertEquals(3, (int) byLastName.get(0).getId());
+
+        List<Person> byNone = instance.withName(null, null);
+        assertEquals(6, byNone.size());
+
+        List<Person> byBoth = instance.withName("first1", "last2");
+        assertEquals(1, byBoth.size());
+        assertEquals(6, (int) byBoth.get(0).getId());
     }
 }

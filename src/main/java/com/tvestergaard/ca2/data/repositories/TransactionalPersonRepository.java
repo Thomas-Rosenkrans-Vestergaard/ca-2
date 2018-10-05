@@ -8,6 +8,7 @@ import com.tvestergaard.ca2.data.entities.Phone;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 /**
@@ -37,6 +38,23 @@ public class TransactionalPersonRepository extends TransactionalCrudRepository<P
         person.setAddress(address);
         person.setPhoneNumbers(phones);
         return persist(person);
+    }
+
+    @Override public List<Person> withName(String firstName, String lastName)
+    {
+        StringBuilder builder = new StringBuilder("SELECT p FROM Person p WHERE p.id != null ");
+        if (firstName != null)
+            builder.append("AND p.firstName = :firstName ");
+        if (lastName != null)
+            builder.append("AND p.lastName = :lastName");
+
+        TypedQuery<Person> query = getEntityManager().createQuery(builder.toString(), Person.class);
+        if (firstName != null)
+            query.setParameter("firstName", firstName);
+        if (lastName != null)
+            query.setParameter("lastName", lastName);
+
+        return query.getResultList();
     }
 
     @Override
