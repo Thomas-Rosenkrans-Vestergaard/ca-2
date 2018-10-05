@@ -11,7 +11,7 @@ public class PersonDTO
     public String         firstName;
     public String         lastName;
     public String         email;
-    public List<PhoneDTO> phoneNumbers;
+    public List<PhoneDTO> phones;
     public AddressDTO     address;
 
     public PersonDTO(Person person, boolean showPhoneNumbers, boolean showAddress, boolean showHobbies)
@@ -21,10 +21,10 @@ public class PersonDTO
         this.lastName = person.getLastName();
         this.email = person.getEmail();
         if (showPhoneNumbers)
-            this.phoneNumbers = person.getPhoneNumbers()
-                                      .stream()
-                                      .map(phoneNumber -> new PhoneDTO(phoneNumber))
-                                      .collect(Collectors.toList());
+            this.phones = person.getPhoneNumbers()
+                                .stream()
+                                .map(phoneNumber -> new PhoneDTO(phoneNumber))
+                                .collect(Collectors.toList());
         if(showAddress && person.getAddress() != null)
             this.address = new AddressDTO(person.getAddress(), true);
     }

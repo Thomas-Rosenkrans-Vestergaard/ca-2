@@ -39,7 +39,8 @@ public class TransactionalPersonRepository extends TransactionalCrudRepository<P
         return persist(person);
     }
 
-    @Override public Person update(int id, String firstName, String lastName, String email)
+    @Override
+    public Person update(int id, String firstName, String lastName, String email, Address address, List<Phone> phones)
     {
         Person person = get(id);
         if (person == null)
@@ -49,6 +50,8 @@ public class TransactionalPersonRepository extends TransactionalCrudRepository<P
         person.setFirstName(firstName);
         person.setLastName(lastName);
         person.setEmail(email);
+        person.setAddress(address);
+        person.setPhoneNumbers(phones);
         entityManager.merge(person);
 
         return person;

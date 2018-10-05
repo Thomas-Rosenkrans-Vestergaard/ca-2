@@ -89,9 +89,9 @@ public class PersonResource
     @Produces(APPLICATION_JSON)
     public Response post(String received) throws Exception
     {
-        ReceivedPerson            receivedPerson       = gson.fromJson(received, ReceivedPerson.class);
+        PostedPerson              postedPerson         = gson.fromJson(received, PostedPerson.class);
         Validator                 validator            = new Validator();
-        List<ConstraintViolation> constraintViolations = validator.validate(receivedPerson);
+        List<ConstraintViolation> constraintViolations = validator.validate(postedPerson);
         if (!constraintViolations.isEmpty())
             throw new ValidationException("Could not validate submitted person.", constraintViolations);
 
@@ -100,16 +100,16 @@ public class PersonResource
         TransactionalCityRepository    cityRepository    = new TransactionalCityRepository(repository.getEntityManager());
         try {
             repository.begin();
-            City city = cityRepository.get(receivedPerson.address.city);
+            City city = cityRepository.get(postedPerson.address.city);
             if (city == null)
-                throw new CityNotFoundException(receivedPerson.address.city);
-            Address address = addressRepository.getOrCreate(receivedPerson.address.street,
-                                                            receivedPerson.address.information,
+                throw new CityNotFoundException(postedPerson.address.city);
+            Address address = addressRepository.getOrCreate(postedPerson.address.street,
+                                                            postedPerson.address.information,
                                                             city);
             List<Phone> phoneNumbers = new ArrayList<>();
-            for (ReceivedPhone receivedPhone : receivedPerson.phones)
-                phoneNumbers.add(new Phone(receivedPhone.number, receivedPhone.description));
-            Person person = repository.create(receivedPerson.firstName, receivedPerson.lastName, receivedPerson.email,
+            for (PostPhone postPhone : postedPerson.phones)
+                phoneNumbers.add(new Phone(postPhone.number, postPhone.description));
+            Person person = repository.create(postedPerson.firstName, postedPerson.lastName, postedPerson.email,
                                               address,
                                               phoneNumbers);
             repository.commit();
@@ -146,10 +146,6 @@ public class PersonResource
         @AssertValid
         @NotNull
         public ReceivedAddress address;
-
-        @AssertValid
-        @NotNull
-        public List<ReceivedPhone> phones;
     }
 
     private static class ReceivedAddress
@@ -167,7 +163,23 @@ public class PersonResource
         public int city;
     }
 
-    private static class ReceivedPhone
+    private static class PostedPerson extends ReceivedPerson
+    {
+
+        @AssertValid
+        @NotNull
+        public List<PostPhone> phones;
+    }
+
+    private static class PutPerson extends ReceivedPerson
+    {
+
+        @AssertValid
+        @NotNull
+        public List<PutPhone> phones;
+    }
+
+    private static class PostPhone
     {
 
         @NotNull
@@ -179,25 +191,53 @@ public class PersonResource
         public String description;
     }
 
+    private static class PutPhone extends PostPhone
+    {
+
+        @NotNull
+        @Size(min = 0)
+        public Integer id;
+    }
+
     @PUT
     @Path("{id: [0-9]+}")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     public Response put(@PathParam("id") int id, String received) throws Exception
     {
-        ReceivedPerson                receivedPerson = gson.fromJson(received, ReceivedPerson.class);
-        TransactionalPersonRepository repository     = new TransactionalPersonRepository(emf);
+        PutPerson                 putPerson            = gson.fromJson(received, PutPerson.class);
+        Validator                 validator            = new Validator();
+        List<ConstraintViolation> constraintViolations = validator.validate(putPerson);
+        if (!constraintViolations.isEmpty())
+            throw new ValidationException("Could not validate submitted person.", constraintViolations);
+
+        TransactionalPersonRepository  repository        = new TransactionalPersonRepository(emf);
+        TransactionalAddressRepository addressRepository = new TransactionalAddressRepository(repository.getEntityManager());
+        TransactionalCityRepository    cityRepository    = new TransactionalCityRepository(repository.getEntityManager());
         try {
             repository.begin();
-            Person person = repository.update(id, receivedPerson.firstName, receivedPerson.lastName, receivedPerson.email);
-            if (person == null)
-                throw new PersonNotFoundException(id);
+            City city = cityRepository.get(putPerson.address.city);
+            if (city == null)
+                throw new CityNotFoundException(putPerson.address.city);
+            Address address = addressRepository.getOrCreate(putPerson.address.street,
+                                                            putPerson.address.information,
+                                                            city);
+            List<Phone> phoneNumbers = new ArrayList<>();
+            for (PutPhone putPhone : putPerson.phones)
+                phoneNumbers.add(new Phone(putPhone.number, putPhone.description));
+            Person person = repository.update(id, putPerson.firstName, putPerson.lastName, putPerson.email,
+                                              address,
+                                              phoneNumbers);
             repository.commit();
+
             PersonDTO personDTO = new PersonDTO(person, true, true, false);
 
-            return Response.status(201)
+            return Response.status(200)
                            .entity(gson.toJson(personDTO))
                            .build();
+        } catch (PersistenceException e) {
+            repository.rollback();
+            throw e;
         } finally {
             repository.close();
         }

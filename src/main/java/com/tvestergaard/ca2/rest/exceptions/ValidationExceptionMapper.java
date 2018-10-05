@@ -50,6 +50,7 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
     {
         public String                       exception;
         public String                       message;
+
         public Integer                      responseCode;
         public Boolean                      debug;
         public List<ConstraintViolationDTO> violations = new ArrayList<>();

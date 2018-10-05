@@ -29,9 +29,11 @@ public interface PersonRepository extends CrudRepository<Person, Integer>
      * @param firstName The new first name.
      * @param lastName  The new last name.
      * @param email     The new email.
+     * @param address   The address of the person.
+     * @param phones    The phone numbers of the person.
      * @return The updated person.
      */
-    Person update(int id, String firstName, String lastName, String email);
+    Person update(int id, String firstName, String lastName, String email, Address address, List<Phone> phones);
 
     /**
      * Returns the person with the provided phone number.
