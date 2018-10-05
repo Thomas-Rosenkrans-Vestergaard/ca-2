@@ -254,7 +254,7 @@ public class PersonResource
     }
 
     @GET
-    @Path("first/{first}/last/{last}")
+    @Path("first/{first: .*}/last/{last: .*}")
     @Produces(APPLICATION_JSON)
     public Response withName(@PathParam("first") String first, @PathParam("last") String last)
     {
