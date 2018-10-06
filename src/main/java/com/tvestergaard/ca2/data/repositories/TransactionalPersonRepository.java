@@ -39,6 +39,18 @@ public class TransactionalPersonRepository extends TransactionalCrudRepository<P
         return persist(person);
     }
 
+    @Override public Person delete(Integer id)
+    {
+        EntityManager entityManager = this.getEntityManager();
+        Person             find          = entityManager.find(Person.class, id);
+        if (find == null)
+            return null;
+
+        find.setAddress(null);
+        entityManager.remove(find);
+        return find;
+    }
+
     @Override public List<Person> withName(String firstName, String lastName)
     {
         StringBuilder builder = new StringBuilder("SELECT p FROM Person p WHERE p.id != null ");

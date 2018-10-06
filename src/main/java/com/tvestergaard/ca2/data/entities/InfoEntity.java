@@ -19,7 +19,7 @@ public abstract class InfoEntity
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     protected List<Phone> phoneNumbers = new ArrayList<>();
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.REMOVE})
     protected Address address;
 
     public InfoEntity()
