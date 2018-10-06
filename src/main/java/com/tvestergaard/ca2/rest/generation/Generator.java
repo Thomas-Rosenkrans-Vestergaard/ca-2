@@ -96,7 +96,7 @@ public class Generator
             String email = String.format("%s-%s-%s@%s.%s",
                     firstName.toLowerCase(),
                     lastName.toLowerCase(),
-                    "" + personId + random.nextInt(500),
+                    personId,
                     random(emailEndings),
                     random(emailDomains));
             String personSQL = String.format(
@@ -150,7 +150,7 @@ public class Generator
 
             String name = "Company #" + companyID;
             String email = String.format("company-%s@%s.%s",
-                    "" + companyID + random.nextInt(500),
+                    companyID,
                     random(emailEndings),
                     random(emailDomains));
             String cvr = "#" + String.valueOf(random.nextInt(99_99_99_99) + 1);
