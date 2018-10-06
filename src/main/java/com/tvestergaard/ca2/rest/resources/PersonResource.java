@@ -32,8 +32,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class PersonResource
 {
 
-    private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("ca2-rest-pu");
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final EntityManagerFactory emf  = Persistence.createEntityManagerFactory("ca2-rest-pu");
+    private static final Gson                 gson = new GsonBuilder().setPrettyPrinting().create();
 
     @GET
     @Produces(APPLICATION_JSON)
@@ -316,6 +316,17 @@ public class PersonResource
         return repository(repository ->
                 Response.ok()
                         .entity(gson.toJson(toDTOs(repository.withHobby(name))))
+                        .build());
+    }
+
+    @GET
+    @Path("phone/{phoneNumber: .*}")
+    @Produces(APPLICATION_JSON)
+    public Response withPhoneNumber(@PathParam("phoneNumber") String phoneNumber) throws Exception
+    {
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(toDTOs(repository.withPhoneNumber(phoneNumber))))
                         .build());
     }
 

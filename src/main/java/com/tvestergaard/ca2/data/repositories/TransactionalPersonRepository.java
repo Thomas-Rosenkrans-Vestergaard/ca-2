@@ -7,7 +7,6 @@ import com.tvestergaard.ca2.data.entities.Phone;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
@@ -75,19 +74,15 @@ public class TransactionalPersonRepository extends TransactionalCrudRepository<P
         return person;
     }
 
-    @Override public Person withPhoneNumber(String phoneNumber)
+    @Override public List<Person> withPhoneNumber(String phoneNumber)
     {
         EntityManager entityManager = getEntityManager();
 
-        try {
-            return entityManager.createQuery(
-                    "SELECT c FROM Person c INNER JOIN Phone p ON c.id = p.owner.id WHERE p.number = :phone",
-                    Person.class)
-                                .setParameter("phone", phoneNumber)
-                                .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
+        return entityManager.createQuery(
+                "SELECT c FROM Person c INNER JOIN Phone p ON c.id = p.owner.id WHERE p.number = :phone",
+                Person.class)
+                            .setParameter("phone", phoneNumber)
+                            .getResultList();
     }
 
     @Override public List<Person> withHobby(String hobbyName)
@@ -95,7 +90,7 @@ public class TransactionalPersonRepository extends TransactionalCrudRepository<P
         EntityManager entityManager = getEntityManager();
 
         return entityManager.createQuery("SELECT elements(h.persons) FROM Hobby h WHERE h.name = :hobbyName",
-                                         Person.class)
+                Person.class)
                             .setParameter("hobbyName", hobbyName)
                             .getResultList();
     }

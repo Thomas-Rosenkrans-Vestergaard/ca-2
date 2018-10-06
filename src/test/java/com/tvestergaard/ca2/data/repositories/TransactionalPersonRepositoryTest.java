@@ -69,16 +69,10 @@ public class TransactionalPersonRepositoryTest
     @Test
     public void withPhoneNumber()
     {
-        Person person = instance.withPhoneNumber("number2");
+        List<Person> persons = instance.withPhoneNumber("number2");
 
-        assertNotNull(person);
-        assertEquals("first2", person.getFirstName());
-    }
-
-    @Test
-    public void withPhoneNumberReturnsNull()
-    {
-        assertNull(instance.withPhoneNumber(""));
+        assertEquals(1, persons.size());
+        assertEquals("first2", persons.get(0).getFirstName());
     }
 
     @Test

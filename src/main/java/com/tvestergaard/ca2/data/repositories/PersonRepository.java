@@ -45,12 +45,12 @@ public interface PersonRepository extends CrudRepository<Person, Integer>
     List<Person> withName(String firstName, String lastName);
 
     /**
-     * Returns the person with the provided phone number.
+     * Returns the person(s) with the provided phone number.
      *
      * @param phoneNumber The phone number of the person to return.
-     * @return The person with the provided phone number, or {@code null} when no such person exists.
+     * @return The person(s) with the provided phone number.
      */
-    Person withPhoneNumber(String phoneNumber);
+    List<Person> withPhoneNumber(String phoneNumber);
 
     /**
      * Returns all the people with the hobby with the provided name.
