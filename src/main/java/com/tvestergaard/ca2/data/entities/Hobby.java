@@ -15,6 +15,7 @@ public class Hobby
     @Column(length = 255, nullable = false, unique = true)
     private String name;
 
+    @Lob
     @Column(length = 255, nullable = false, unique = true)
     private String description;
 
