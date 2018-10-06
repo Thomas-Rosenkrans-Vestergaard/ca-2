@@ -61,6 +61,24 @@ public class PersonResource
     }
 
     @GET
+    @Path("street/{street: .*}/city/{city: [0-9]*}")
+    @Produces(APPLICATION_JSON)
+    public Response byLocation(@PathParam("street") String street, @PathParam("city") int city) throws Exception
+    {
+        String  s = street.isEmpty() ? null : street;
+        Integer c = city == 0 ? null : city;
+
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(repository
+                                .byAddress(s, c)
+                                .stream()
+                                .map(p -> new PersonDTO(p, true, true, false))
+                                .collect(Collectors.toList())))
+                        .build());
+    }
+
+    @GET
     @Path("count")
     @Produces(APPLICATION_JSON)
     public Response count() throws Exception
@@ -290,7 +308,7 @@ public class PersonResource
     public Response withName(@PathParam("first") String first, @PathParam("last") String last) throws Exception
     {
         String firstName = first.isEmpty() ? null : first;
-        String lastName = last.isEmpty() ? null : last;
+        String lastName  = last.isEmpty() ? null : last;
 
         return repository(repository -> {
             List<PersonDTO> results = repository.withName(firstName, lastName)

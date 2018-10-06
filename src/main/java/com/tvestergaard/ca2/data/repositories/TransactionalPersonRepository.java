@@ -150,4 +150,21 @@ public class TransactionalPersonRepository extends TransactionalCrudRepository<P
                                  .setParameter("cityName", cityName)
                                  .getResultList();
     }
+
+    @Override public List<Person> byAddress(String street, Integer city)
+    {
+        StringBuilder builder = new StringBuilder("SELECT p FROM Person p WHERE p.id != null ");
+        if (street != null)
+            builder.append("AND p.address.street = :street ");
+        if (city != null)
+            builder.append("AND p.address.city.id = :city");
+
+        TypedQuery<Person> query = getEntityManager().createQuery(builder.toString(), Person.class);
+        if (street != null)
+            query.setParameter("street", street);
+        if (city != null)
+            query.setParameter("city", city);
+
+        return query.getResultList();
+    }
 }

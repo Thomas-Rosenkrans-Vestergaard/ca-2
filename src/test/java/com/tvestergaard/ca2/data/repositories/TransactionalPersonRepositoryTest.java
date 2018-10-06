@@ -247,4 +247,22 @@ public class TransactionalPersonRepositoryTest
         assertEquals(1, byBoth.size());
         assertEquals(6, (int) byBoth.get(0).getId());
     }
+
+    @Test
+    public void byAddress()
+    {
+        List<Person> byStreet = instance.byAddress("street1", (Integer) null);
+        assertEquals(1, byStreet.size());
+        assertEquals(1, (int) byStreet.get(0).getId());
+
+        List<Person> byCity = instance.byAddress(null, 3);
+        assertEquals(1, byCity.size());
+        assertEquals(3, (int) byCity.get(0).getId());
+
+        List<Person> byNone = instance.byAddress(null, (Integer) null);
+        assertEquals(6, byNone.size());
+
+        List<Person> byBoth = instance.byAddress("street5", 5);
+        assertEquals(2, byBoth.size());
+    }
 }

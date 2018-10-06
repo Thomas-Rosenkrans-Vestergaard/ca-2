@@ -115,4 +115,25 @@ public interface PersonRepository extends CrudRepository<Person, Integer>
      * @return The people in the city with the provided id.
      */
     List<Person> inCity(Integer id);
+
+    /**
+     * Returns the people on the street in the city with the provided id.
+     *
+     * @param street The street to include results by, when {@code null} the constraint is ignored.
+     * @param city   The id of the city to include results by, when {@code null} the constraint is ignored.
+     * @return The resulting people.
+     */
+    List<Person> byAddress(String street, Integer city);
+
+    /**
+     * Returns the people on the street in the city with the provided id.
+     *
+     * @param street The street to include results by, when {@code null} the constraint is ignored.
+     * @param city   The city to include results by, when {@code null} the constraint is ignored.
+     * @return The resulting people.
+     */
+    default List<Person> byAddress(String street, City city)
+    {
+        return byAddress(street, city == null ? null : city.getId());
+    }
 }
