@@ -11,16 +11,16 @@ public abstract class InfoEntity
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Integer id;
+    protected Integer id;
 
     @Column(length = 255, nullable = false, unique = true)
-    private String email;
+    protected String email;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-    private List<Phone> phoneNumbers = new ArrayList<>();
+    protected List<Phone> phoneNumbers = new ArrayList<>();
 
     @ManyToOne(cascade = CascadeType.ALL)
-    private Address address;
+    protected Address address;
 
     public InfoEntity()
     {

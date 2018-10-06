@@ -7,10 +7,6 @@ import java.util.Objects;
 public class Company extends InfoEntity
 {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
     @Column(length = 255, nullable = false, unique = true)
     private String name;
 
@@ -40,17 +36,6 @@ public class Company extends InfoEntity
         this.cvr = cvr;
         this.numberOfEmployees = numberOfEmployees;
         this.marketValue = marketValue;
-    }
-
-    @Override public Integer getId()
-    {
-        return this.id;
-    }
-
-    public Company setId(Integer id)
-    {
-        this.id = id;
-        return this;
     }
 
     public String getName()

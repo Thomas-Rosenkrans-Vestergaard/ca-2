@@ -1,4 +1,4 @@
-package com.tvestergaard.ca2.rest;
+package com.tvestergaard.ca2.rest.resources;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
