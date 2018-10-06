@@ -41,7 +41,7 @@ public class PersonResource
     {
         return repository(repository ->
                 Response.ok()
-                        .entity(gson.toJson(repository.get().stream().map(p -> new PersonDTO(p, true, true, false)).collect(Collectors.toList())))
+                        .entity(gson.toJson(repository.get().stream().map(p -> new PersonDTO(p)).collect(Collectors.toList())))
                         .build());
     }
 
@@ -103,7 +103,7 @@ public class PersonResource
                 throw new PersonNotFoundException(id);
 
             return Response.ok()
-                           .entity(gson.toJson(new PersonDTO(person, true, true, false)))
+                           .entity(gson.toJson(new PersonDTO(person)))
                            .build();
         });
     }
@@ -154,7 +154,7 @@ public class PersonResource
                     phoneNumbers);
             repository.commit();
 
-            PersonDTO personDTO = new PersonDTO(person, true, true, false);
+            PersonDTO personDTO = new PersonDTO(person);
 
             return Response.status(201)
                            .entity(gson.toJson(personDTO))
@@ -270,7 +270,7 @@ public class PersonResource
                     phoneNumbers);
             repository.commit();
 
-            PersonDTO personDTO = new PersonDTO(person, true, true, false);
+            PersonDTO personDTO = new PersonDTO(person);
 
             return Response.status(200)
                            .entity(gson.toJson(personDTO))
@@ -398,7 +398,7 @@ public class PersonResource
             if (person == null)
                 throw new PersonNotFoundException(id);
 
-            return Response.ok(gson.toJson(new PersonDTO(person, true, true, false))).build();
+            return Response.ok(gson.toJson(new PersonDTO(person))).build();
         } finally {
             personRepository.close();
         }
@@ -431,7 +431,7 @@ public class PersonResource
     {
         List<PersonDTO> result = new ArrayList<>();
         for (Person person : entities)
-            result.add(new PersonDTO(person, true, true, false));
+            result.add(new PersonDTO(person));
 
         return result;
     }

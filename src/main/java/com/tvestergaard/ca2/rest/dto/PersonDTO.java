@@ -14,6 +14,11 @@ public class PersonDTO
     public List<PhoneDTO> phones;
     public AddressDTO     address;
 
+    public PersonDTO(Person person)
+    {
+        this(person, true, true, true);
+    }
+
     public PersonDTO(Person person, boolean showPhoneNumbers, boolean showAddress, boolean showHobbies)
     {
         this.id = person.getId();
@@ -25,7 +30,7 @@ public class PersonDTO
                                 .stream()
                                 .map(phoneNumber -> new PhoneDTO(phoneNumber))
                                 .collect(Collectors.toList());
-        if(showAddress && person.getAddress() != null)
+        if (showAddress && person.getAddress() != null)
             this.address = new AddressDTO(person.getAddress(), true);
     }
 }
