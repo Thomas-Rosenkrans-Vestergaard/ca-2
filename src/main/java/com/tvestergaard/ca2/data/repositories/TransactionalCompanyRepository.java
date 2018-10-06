@@ -5,6 +5,7 @@ import com.tvestergaard.ca2.data.entities.Company;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 
@@ -63,5 +64,30 @@ public class TransactionalCompanyRepository extends TransactionalCrudRepository<
                 .createQuery("SELECT c FROM Company c WHERE c.numberOfEmployees > :numberOfEmployees", Company.class)
                 .setParameter("numberOfEmployees", numberOfEmployees)
                 .getResultList();
+    }
+
+    @Override public List<Company> bySize(Integer minMarketValue, Integer maxMarketValue, Integer minEmployees, Integer maxEmployees)
+    {
+        StringBuilder builder = new StringBuilder("SELECT c FROM Company c WHERE c.id != null ");
+        if (minMarketValue != null)
+            builder.append("AND c.marketValue >= :minMarketValue ");
+        if (maxMarketValue != null)
+            builder.append("AND c.marketValue <= :maxMarketValue ");
+        if (minEmployees != null)
+            builder.append("AND c.numberOfEmployees >= :minEmployees ");
+        if (maxEmployees != null)
+            builder.append("AND c.numberOfEmployees <= :maxEmployees ");
+
+        TypedQuery<Company> query = getEntityManager().createQuery(builder.toString(), Company.class);
+        if (minMarketValue != null)
+            query.setParameter("minMarketValue", minMarketValue);
+        if (maxMarketValue != null)
+            query.setParameter("maxMarketValue", maxMarketValue);
+        if (minEmployees != null)
+            query.setParameter("minEmployees", minEmployees);
+        if (maxEmployees != null)
+            query.setParameter("maxEmployees", maxEmployees);
+
+        return query.getResultList();
     }
 }

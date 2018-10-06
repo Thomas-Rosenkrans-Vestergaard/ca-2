@@ -145,4 +145,22 @@ public class TransactionalCompanyRepositoryTest
     {
         assertNull(instance.delete(-1));
     }
+
+    @Test
+    public void bySize()
+    {
+        List<Company> noCriteria = instance.bySize(null, null, null, null);
+        assertEquals(5, noCriteria.size());
+
+        List<Company> lowerBound = instance.bySize(2, null, 2, null);
+        assertEquals(4, lowerBound.size());
+
+        List<Company> upperBound = instance.bySize(null, 3, null, 4);
+        assertEquals(3, upperBound.size());
+
+        List<Company> bothBounds = instance.bySize(1, 4, 2, 3);
+        assertEquals(2, bothBounds.size());
+        assertEquals(7, (int)bothBounds.get(0).getId()); // check ids of result (company ids are offset by 5)
+        assertEquals(8, (int)bothBounds.get(1).getId()); // check ids of result (company ids are offset by 5)
+    }
 }

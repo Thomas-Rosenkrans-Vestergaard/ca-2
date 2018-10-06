@@ -30,4 +30,15 @@ public interface CompanyRepository extends CrudRepository<Company, Integer>
      * @return The companies with more than the providede number of employees.
      */
     List<Company> withMoreThan(int numberOfEmployees);
+
+    /**
+     * Returns the companies matching the provided size criteria.
+     *
+     * @param minMarketValue The minimum market value (>=) a company must have, ignored when {@code null}.
+     * @param maxMarketValue The maximum market value (<=) a company must have, ignored when {@code null}.
+     * @param minEmployees   The minimum number of employees (>=) a company must have, ignored when {@code null}.
+     * @param maxEmployees   The maximum number of employees (<=) a company must have, ignored when {@code null}.
+     * @return The companies matching the provided criteria.
+     */
+    List<Company> bySize(Integer minMarketValue, Integer maxMarketValue, Integer minEmployees, Integer maxEmployees);
 }

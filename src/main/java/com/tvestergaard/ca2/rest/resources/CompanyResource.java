@@ -14,7 +14,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +55,25 @@ public class CompanyResource
         return repository(repository ->
                 Response.ok()
                         .entity(gson.toJson(count(repository.count())))
+                        .build());
+    }
+
+    @GET
+    @Path("size/{minMarketValue: [0-9]*}/{maxMarketValue: [0-9]*}/{minEmployees: [0-9]*}/{maxEmployees: [0-9]*}")
+    @Produces(APPLICATION_JSON)
+    public Response bySize(
+            @PathParam("minMarketValue") String minMarketValue,
+            @PathParam("maxMarketValue") String maxMarketValue,
+            @PathParam("minEmployees") String minEmployees,
+            @PathParam("maxEmployees") String maxEmployees) throws Exception
+    {
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(toDTOs(repository.bySize(
+                                minMarketValue.isEmpty() ? null : Integer.parseInt(minMarketValue),
+                                maxMarketValue.isEmpty() ? null : Integer.parseInt(maxMarketValue),
+                                minEmployees.isEmpty() ? null : Integer.parseInt(minEmployees),
+                                maxEmployees.isEmpty() ? null : Integer.parseInt(maxEmployees)))))
                         .build());
     }
 
