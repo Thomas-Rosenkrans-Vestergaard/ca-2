@@ -33,7 +33,6 @@ public class PersonResource
 {
 
     private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("ca2-rest-pu");
-
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     @GET
@@ -53,10 +52,7 @@ public class PersonResource
     {
         return repository(repository ->
                 Response.ok()
-                        .entity(gson.toJson(repository.get(pageSize, pageNumber)
-                                                      .stream()
-                                                      .map(p -> new PersonDTO(p, true, true, false))
-                                                      .collect(Collectors.toList())))
+                        .entity(gson.toJson(toDTOs(repository.get(pageSize, pageNumber))))
                         .build());
     }
 
@@ -70,11 +66,7 @@ public class PersonResource
 
         return repository(repository ->
                 Response.ok()
-                        .entity(gson.toJson(repository
-                                .byAddress(s, c)
-                                .stream()
-                                .map(p -> new PersonDTO(p, true, true, false))
-                                .collect(Collectors.toList())))
+                        .entity(gson.toJson(toDTOs(repository.byAddress(s, c))))
                         .build());
     }
 
@@ -96,7 +88,7 @@ public class PersonResource
     {
         return repository(repository ->
                 Response.ok()
-                        .entity(gson.toJson(repository.get().stream().map(p -> new ContactDTO(p)).collect(Collectors.toList())))
+                        .entity(gson.toJson(toDTOs(repository.get())))
                         .build());
     }
 
@@ -298,7 +290,7 @@ public class PersonResource
     {
         return repository(repository ->
                 Response.ok()
-                        .entity(gson.toJson(repository.withHobby(id)))
+                        .entity(gson.toJson(toDTOs(repository.withHobby(id))))
                         .build());
     }
 
@@ -310,16 +302,10 @@ public class PersonResource
         String firstName = first.isEmpty() ? null : first;
         String lastName  = last.isEmpty() ? null : last;
 
-        return repository(repository -> {
-            List<PersonDTO> results = repository.withName(firstName, lastName)
-                                                .stream()
-                                                .map(p -> new PersonDTO(p, true, true, false))
-                                                .collect(Collectors.toList());
-
-            return Response.ok()
-                           .entity(gson.toJson(results))
-                           .build();
-        });
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(toDTOs(repository.withName(firstName, lastName))))
+                        .build());
     }
 
     @GET
@@ -329,7 +315,7 @@ public class PersonResource
     {
         return repository(repository ->
                 Response.ok()
-                        .entity(gson.toJson(repository.withHobby(name)))
+                        .entity(gson.toJson(toDTOs(repository.withHobby(name))))
                         .build());
     }
 
@@ -362,7 +348,7 @@ public class PersonResource
     {
         return repository(repository ->
                 Response.ok()
-                        .entity(gson.toJson(repository.inZipCode(code)))
+                        .entity(gson.toJson(toDTOs(repository.inZipCode(code))))
                         .build());
     }
 
@@ -373,7 +359,7 @@ public class PersonResource
     {
         return repository(repository ->
                 Response.ok()
-                        .entity(gson.toJson(repository.inCity("name")))
+                        .entity(gson.toJson(toDTOs(repository.inCity(name))))
                         .build());
     }
 
@@ -384,7 +370,7 @@ public class PersonResource
     {
         return repository(repository ->
                 Response.ok()
-                        .entity(gson.toJson(repository.inCity(id)))
+                        .entity(gson.toJson(toDTOs(repository.inCity(id))))
                         .build());
     }
 
@@ -428,5 +414,14 @@ public class PersonResource
         } finally {
             repository.close();
         }
+    }
+
+    private List<PersonDTO> toDTOs(List<Person> entities)
+    {
+        List<PersonDTO> result = new ArrayList<>();
+        for (Person person : entities)
+            result.add(new PersonDTO(person, true, true, false));
+
+        return result;
     }
 }
