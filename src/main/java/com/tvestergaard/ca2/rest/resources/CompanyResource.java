@@ -59,7 +59,7 @@ public class CompanyResource
     }
 
     @GET
-    @Path("size/{minMarketValue: [0-9]*}/{maxMarketValue: [0-9]*}/{minEmployees: [0-9]*}/{maxEmployees: [0-9]*}")
+    @Path("size/{minMarketValue: [0-9_]*}/{maxMarketValue: [0-9_]*}/{minEmployees: [0-9_]*}/{maxEmployees: [0-9_]*}")
     @Produces(APPLICATION_JSON)
     public Response bySize(
             @PathParam("minMarketValue") String minMarketValue,
@@ -70,10 +70,10 @@ public class CompanyResource
         return repository(repository ->
                 Response.ok()
                         .entity(gson.toJson(toDTOs(repository.bySize(
-                                minMarketValue.isEmpty() ? null : Integer.parseInt(minMarketValue),
-                                maxMarketValue.isEmpty() ? null : Integer.parseInt(maxMarketValue),
-                                minEmployees.isEmpty() ? null : Integer.parseInt(minEmployees),
-                                maxEmployees.isEmpty() ? null : Integer.parseInt(maxEmployees)))))
+                                minMarketValue.equals("_") ? null : Integer.parseInt(minMarketValue),
+                                maxMarketValue.equals("_") ? null : Integer.parseInt(maxMarketValue),
+                                minEmployees.equals("_") ? null : Integer.parseInt(minEmployees),
+                                maxEmployees.equals("_") ? null : Integer.parseInt(maxEmployees)))))
                         .build());
     }
 

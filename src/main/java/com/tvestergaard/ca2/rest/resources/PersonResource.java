@@ -61,7 +61,7 @@ public class PersonResource
     @Produces(APPLICATION_JSON)
     public Response getPersonsByAddress(@PathParam("street") String street, @PathParam("city") int city) throws Exception
     {
-        String  s = street.isEmpty() ? null : street;
+        String  s = street.equals("_") ? null : street;
         Integer c = city == 0 ? null : city;
 
         return repository(repository ->
@@ -113,8 +113,8 @@ public class PersonResource
     @Produces(APPLICATION_JSON)
     public Response getPersonsWithName(@PathParam("first") String first, @PathParam("last") String last) throws Exception
     {
-        String firstName = first.isEmpty() ? null : first;
-        String lastName  = last.isEmpty() ? null : last;
+        String firstName = first.equals("_") ? null : first;
+        String lastName  = last.equals("_") ? null : last;
 
         return repository(repository ->
                 Response.ok()
@@ -234,7 +234,7 @@ public class PersonResource
         PostedPerson              postedPerson         = gson.fromJson(received, PostedPerson.class);
         Validator                 validator            = new Validator();
         List<ConstraintViolation> constraintViolations = validator.validate(postedPerson);
-        if (!constraintViolations.isEmpty())
+        if (!constraintViolations.equals("_"))
             throw new ValidationException("Could not validate submitted person.", constraintViolations);
 
         TransactionalPersonRepository  repository        = new TransactionalPersonRepository(emf);
@@ -278,7 +278,7 @@ public class PersonResource
         PostedPerson              postedPerson         = gson.fromJson(received, PostedPerson.class);
         Validator                 validator            = new Validator();
         List<ConstraintViolation> constraintViolations = validator.validate(postedPerson);
-        if (!constraintViolations.isEmpty())
+        if (!constraintViolations.equals("_"))
             throw new ValidationException("Could not validate submitted person.", constraintViolations);
 
         TransactionalPersonRepository  repository        = new TransactionalPersonRepository(emf);
