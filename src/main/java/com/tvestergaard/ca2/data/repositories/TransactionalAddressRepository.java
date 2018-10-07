@@ -28,9 +28,9 @@ public class TransactionalAddressRepository extends TransactionalCrudRepository<
     /**
      * Returns an existing address matching the provided information, or creates a new record.
      *
-     * @param street      The street of the address to get or create.
-     * @param information The information attribute of the address to get or create.
-     * @param city        The city of the address to get or create.
+     * @param street      The street of the address to getCities or create.
+     * @param information The information attribute of the address to getCities or create.
+     * @param city        The city of the address to getCities or create.
      * @return The resulting address entity.
      */
     @Override public Address getOrCreate(String street, String information, City city)

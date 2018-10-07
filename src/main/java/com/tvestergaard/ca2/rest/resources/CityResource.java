@@ -25,19 +25,32 @@ public class CityResource
     private static final TransactionalCityRepository repository = new TransactionalCityRepository(emf);
     private static final Gson                        gson       = new GsonBuilder().setPrettyPrinting().create();
 
+    /**
+     * Returns a compleete list of the cities in the system.
+     *
+     * @return The response containing the cities in the system.
+     * @throws Exception
+     */
     @GET
     @Produces(APPLICATION_JSON)
-    public Response get()
+    public Response getCities() throws Exception
     {
         return Response.ok()
                        .entity(gson.toJson(repository.get().stream().map(c -> new CityDTO(c)).collect(Collectors.toList())))
                        .build();
     }
 
+    /**
+     * Returns the city with the provided id.
+     *
+     * @param id The id of the city to return.
+     * @return The city with the provided id, or {@link CityNotFoundException} when no such city exists.
+     * @throws Exception
+     */
     @GET
     @Path("{id: [0-9]+}")
     @Produces(APPLICATION_JSON)
-    public Response getId(@PathParam("id") int id) throws Exception
+    public Response getCityWithId(@PathParam("id") int id) throws Exception
     {
         City city = repository.get(id);
         if (city == null)
@@ -48,10 +61,15 @@ public class CityResource
                        .build();
     }
 
+    /**
+     * Returns the complete list of the zip-codes in the system.
+     *
+     * @return The complete list of the zip-codes in the system.
+     */
     @GET
     @Path("zip-codes")
     @Produces(APPLICATION_JSON)
-    public Response zipCodes()
+    public Response getZipCodes()
     {
         return Response.ok()
                        .entity(gson.toJson(repository.getZipCodes()))

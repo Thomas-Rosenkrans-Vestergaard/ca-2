@@ -26,7 +26,7 @@ public class HobbyResource
 
     @GET
     @Produces(APPLICATION_JSON)
-    public Response get() throws Exception
+    public Response getHobbies() throws Exception
     {
         return repository(repository ->
                 Response.ok()

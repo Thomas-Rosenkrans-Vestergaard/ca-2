@@ -17,7 +17,7 @@ public interface CrudRepository<E, ID>
      * from <code> (pageNumber - 1) * pageSize</code> to <code>(pageSize) * perPage</code>.
      *
      * @param pageSize    The number of entities per page.
-     * @param pageNumber The page number to get. Starts at 1.
+     * @param pageNumber The page number to getCities. Starts at 1.
      * @return
      */
     List<E> get(int pageSize, int pageNumber);

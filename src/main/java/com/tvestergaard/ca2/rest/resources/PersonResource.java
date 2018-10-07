@@ -37,7 +37,7 @@ public class PersonResource
 
     @GET
     @Produces(APPLICATION_JSON)
-    public Response get() throws Exception
+    public Response getPersons() throws Exception
     {
         return repository(repository ->
                 Response.ok()
@@ -48,7 +48,7 @@ public class PersonResource
     @GET
     @Path("paginated/{pageSize: [0-9]+}/{pageNumber: [0-9]+}")
     @Produces(APPLICATION_JSON)
-    public Response getPagination(@PathParam("pageSize") int pageSize, @PathParam("pageNumber") int pageNumber) throws Exception
+    public Response getPersonsPaginated(@PathParam("pageSize") int pageSize, @PathParam("pageNumber") int pageNumber) throws Exception
     {
         return repository(repository ->
                 Response.ok()
@@ -59,7 +59,7 @@ public class PersonResource
     @GET
     @Path("street/{street: .*}/city/{city: [0-9]*}")
     @Produces(APPLICATION_JSON)
-    public Response byLocation(@PathParam("street") String street, @PathParam("city") int city) throws Exception
+    public Response getPersonsByLocation(@PathParam("street") String street, @PathParam("city") int city) throws Exception
     {
         String  s = street.isEmpty() ? null : street;
         Integer c = city == 0 ? null : city;
@@ -73,7 +73,7 @@ public class PersonResource
     @GET
     @Path("count")
     @Produces(APPLICATION_JSON)
-    public Response count() throws Exception
+    public Response countPersons() throws Exception
     {
         return repository(repository ->
                 Response.ok()
@@ -84,7 +84,7 @@ public class PersonResource
     @GET
     @Path("contact-info")
     @Produces(APPLICATION_JSON)
-    public Response getContactInformation() throws Exception
+    public Response getContactInformations() throws Exception
     {
         return repository(repository ->
                 Response.ok()
@@ -95,7 +95,7 @@ public class PersonResource
     @GET
     @Path("{id: [0-9]+}")
     @Produces(APPLICATION_JSON)
-    public Response getWithId(@PathParam("id") int id) throws Exception
+    public Response getPersonWithId(@PathParam("id") int id) throws Exception
     {
         return repository(repository -> {
             Person person = repository.get(id);
@@ -109,9 +109,23 @@ public class PersonResource
     }
 
     @GET
+    @Path("first/{first: .*}/last/{last: .*}")
+    @Produces(APPLICATION_JSON)
+    public Response getPersonsWithName(@PathParam("first") String first, @PathParam("last") String last) throws Exception
+    {
+        String firstName = first.isEmpty() ? null : first;
+        String lastName  = last.isEmpty() ? null : last;
+
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(toDTOs(repository.withName(firstName, lastName))))
+                        .build());
+    }
+
+    @GET
     @Path("{id: [0-9]+}/contact-info")
     @Produces(APPLICATION_JSON)
-    public Response getWithIdContactInformation(@PathParam("id") int id) throws Exception
+    public Response getContactInformationWithId(@PathParam("id") int id) throws Exception
     {
         return repository(repository -> {
             Person person = repository.get(id);
@@ -124,10 +138,98 @@ public class PersonResource
         });
     }
 
+    @GET
+    @Path("hobby/{id: [0-9]+}")
+    @Produces(APPLICATION_JSON)
+    public Response getPersonsWithHobbyId(@PathParam("id") int id) throws Exception
+    {
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(toDTOs(repository.withHobby(id))))
+                        .build());
+    }
+
+    @GET
+    @Path("hobby/{name: [a-zA-Z ]+}")
+    @Produces(APPLICATION_JSON)
+    public Response getPersonsWithHobbyName(@PathParam("name") String name) throws Exception
+    {
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(toDTOs(repository.withHobby(name))))
+                        .build());
+    }
+
+    @GET
+    @Path("phone/{phoneNumber: .*}")
+    @Produces(APPLICATION_JSON)
+    public Response getPersonsWithPhoneNumber(@PathParam("phoneNumber") String phoneNumber) throws Exception
+    {
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(toDTOs(repository.withPhoneNumber(phoneNumber))))
+                        .build());
+    }
+
+    @GET
+    @Path("hobby/{id: [0-9]+}/getPersonsCount")
+    @Produces(APPLICATION_JSON)
+    public Response countPersonsWithHobbyId(@PathParam("id") int id) throws Exception
+    {
+        return repository(repository ->
+                Response.ok()
+                        .entity(count(repository.countWithHobby(id)).toString())
+                        .build());
+    }
+
+    @GET
+    @Path("hobby/{name: [a-zA-Z ]+}/getPersonsCount")
+    @Produces(APPLICATION_JSON)
+    public Response countPersonsWithHobbyName(@PathParam("name") String name) throws Exception
+    {
+        return repository(repository ->
+                Response.ok()
+                        .entity(count(repository.countWithHobby(name)).toString())
+                        .build());
+    }
+
+    @GET
+    @Path("zip-code/{code}")
+    @Produces(APPLICATION_JSON)
+    public Response getPersonsInZipCode(@PathParam("code") String code) throws Exception
+    {
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(toDTOs(repository.inZipCode(code))))
+                        .build());
+    }
+
+    @GET
+    @Path("city/{name: [a-zA-Z ]+}")
+    @Produces(APPLICATION_JSON)
+    public Response getPersonsInCityName(@PathParam("name") String name) throws Exception
+    {
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(toDTOs(repository.inCity(name))))
+                        .build());
+    }
+
+    @GET
+    @Path("city/{id: [0-9]+}")
+    @Produces(APPLICATION_JSON)
+    public Response getPersonsInCityId(@PathParam("id") int id) throws Exception
+    {
+        return repository(repository ->
+                Response.ok()
+                        .entity(gson.toJson(toDTOs(repository.inCity(id))))
+                        .build());
+    }
+
     @POST
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Response post(String received) throws Exception
+    public Response createPerson(String received) throws Exception
     {
         PostedPerson              postedPerson         = gson.fromJson(received, PostedPerson.class);
         Validator                 validator            = new Validator();
@@ -165,6 +267,101 @@ public class PersonResource
         } finally {
             repository.close();
         }
+    }
+
+    @PUT
+    @Path("{id: [0-9]+}")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response updatePerson(@PathParam("id") int id, String received) throws Exception
+    {
+        PutPerson                 putPerson            = gson.fromJson(received, PutPerson.class);
+        Validator                 validator            = new Validator();
+        List<ConstraintViolation> constraintViolations = validator.validate(putPerson);
+        if (!constraintViolations.isEmpty())
+            throw new ValidationException("Could not validate submitted person.", constraintViolations);
+
+        TransactionalPersonRepository  repository        = new TransactionalPersonRepository(emf);
+        TransactionalAddressRepository addressRepository = new TransactionalAddressRepository(repository.getEntityManager());
+        TransactionalCityRepository    cityRepository    = new TransactionalCityRepository(repository.getEntityManager());
+        try {
+            repository.begin();
+            City city = cityRepository.get(putPerson.address.city);
+            if (city == null)
+                throw new CityNotFoundException(putPerson.address.city);
+            Address address = addressRepository.getOrCreate(putPerson.address.street,
+                    putPerson.address.information,
+                    city);
+            List<Phone> phoneNumbers = new ArrayList<>();
+            for (PutPhone putPhone : putPerson.phones)
+                phoneNumbers.add(new Phone(putPhone.number, putPhone.description));
+            Person person = repository.update(id, putPerson.firstName, putPerson.lastName, putPerson.email,
+                    address,
+                    phoneNumbers);
+            repository.commit();
+
+            PersonDTO personDTO = new PersonDTO(person);
+
+            return Response.status(200)
+                           .entity(gson.toJson(personDTO))
+                           .build();
+        } catch (PersistenceException e) {
+            repository.rollback();
+            throw e;
+        } finally {
+            repository.close();
+        }
+    }
+
+    @DELETE
+    @Path("{id: [0-9]+}")
+    @Produces(APPLICATION_JSON)
+    public Response deletePerson(@PathParam("id") int id) throws Exception
+    {
+        TransactionalPersonRepository personRepository = new TransactionalPersonRepository(emf);
+        try {
+            personRepository.begin();
+            Person person = personRepository.delete(id);
+            personRepository.commit();
+            if (person == null)
+                throw new PersonNotFoundException(id);
+
+            return Response.ok(gson.toJson(new PersonDTO(person))).build();
+        } finally {
+            personRepository.close();
+        }
+    }
+
+    private static JsonObject count(long count)
+    {
+        JsonObject o = new JsonObject();
+        o.addProperty("getPersonsCount", count);
+        return o;
+    }
+
+    @FunctionalInterface
+    private interface ExceptionFunction
+    {
+        public Response call(TransactionalPersonRepository repository) throws Exception;
+    }
+
+    private Response repository(ExceptionFunction f) throws Exception
+    {
+        TransactionalPersonRepository repository = new TransactionalPersonRepository(emf);
+        try {
+            return f.call(repository);
+        } finally {
+            repository.close();
+        }
+    }
+
+    private List<PersonDTO> toDTOs(List<Person> entities)
+    {
+        List<PersonDTO> result = new ArrayList<>();
+        for (Person person : entities)
+            result.add(new PersonDTO(person));
+
+        return result;
     }
 
     private static class ReceivedPerson
@@ -237,202 +434,5 @@ public class PersonResource
         @NotNull
         @Size(min = 0)
         public Integer id;
-    }
-
-    @PUT
-    @Path("{id: [0-9]+}")
-    @Consumes(APPLICATION_JSON)
-    @Produces(APPLICATION_JSON)
-    public Response put(@PathParam("id") int id, String received) throws Exception
-    {
-        PutPerson                 putPerson            = gson.fromJson(received, PutPerson.class);
-        Validator                 validator            = new Validator();
-        List<ConstraintViolation> constraintViolations = validator.validate(putPerson);
-        if (!constraintViolations.isEmpty())
-            throw new ValidationException("Could not validate submitted person.", constraintViolations);
-
-        TransactionalPersonRepository  repository        = new TransactionalPersonRepository(emf);
-        TransactionalAddressRepository addressRepository = new TransactionalAddressRepository(repository.getEntityManager());
-        TransactionalCityRepository    cityRepository    = new TransactionalCityRepository(repository.getEntityManager());
-        try {
-            repository.begin();
-            City city = cityRepository.get(putPerson.address.city);
-            if (city == null)
-                throw new CityNotFoundException(putPerson.address.city);
-            Address address = addressRepository.getOrCreate(putPerson.address.street,
-                    putPerson.address.information,
-                    city);
-            List<Phone> phoneNumbers = new ArrayList<>();
-            for (PutPhone putPhone : putPerson.phones)
-                phoneNumbers.add(new Phone(putPhone.number, putPhone.description));
-            Person person = repository.update(id, putPerson.firstName, putPerson.lastName, putPerson.email,
-                    address,
-                    phoneNumbers);
-            repository.commit();
-
-            PersonDTO personDTO = new PersonDTO(person);
-
-            return Response.status(200)
-                           .entity(gson.toJson(personDTO))
-                           .build();
-        } catch (PersistenceException e) {
-            repository.rollback();
-            throw e;
-        } finally {
-            repository.close();
-        }
-    }
-
-    @GET
-    @Path("hobby/{id: [0-9]+}")
-    @Produces(APPLICATION_JSON)
-    public Response withHobbyId(@PathParam("id") int id) throws Exception
-    {
-        return repository(repository ->
-                Response.ok()
-                        .entity(gson.toJson(toDTOs(repository.withHobby(id))))
-                        .build());
-    }
-
-    @GET
-    @Path("first/{first: .*}/last/{last: .*}")
-    @Produces(APPLICATION_JSON)
-    public Response withName(@PathParam("first") String first, @PathParam("last") String last) throws Exception
-    {
-        String firstName = first.isEmpty() ? null : first;
-        String lastName  = last.isEmpty() ? null : last;
-
-        return repository(repository ->
-                Response.ok()
-                        .entity(gson.toJson(toDTOs(repository.withName(firstName, lastName))))
-                        .build());
-    }
-
-    @GET
-    @Path("hobby/{name: [a-zA-Z ]+}")
-    @Produces(APPLICATION_JSON)
-    public Response withHobbyName(@PathParam("name") String name) throws Exception
-    {
-        return repository(repository ->
-                Response.ok()
-                        .entity(gson.toJson(toDTOs(repository.withHobby(name))))
-                        .build());
-    }
-
-    @GET
-    @Path("phone/{phoneNumber: .*}")
-    @Produces(APPLICATION_JSON)
-    public Response withPhoneNumber(@PathParam("phoneNumber") String phoneNumber) throws Exception
-    {
-        return repository(repository ->
-                Response.ok()
-                        .entity(gson.toJson(toDTOs(repository.withPhoneNumber(phoneNumber))))
-                        .build());
-    }
-
-    @GET
-    @Path("hobby/{id: [0-9]+}/count")
-    @Produces(APPLICATION_JSON)
-    public Response countWithHobbyId(@PathParam("id") int id) throws Exception
-    {
-        return repository(repository ->
-                Response.ok()
-                        .entity(count(repository.countWithHobby(id)).toString())
-                        .build());
-    }
-
-    @GET
-    @Path("hobby/{name: [a-zA-Z ]+}/count")
-    @Produces(APPLICATION_JSON)
-    public Response countWithHobbyName(@PathParam("name") String name) throws Exception
-    {
-        return repository(repository ->
-                Response.ok()
-                        .entity(count(repository.countWithHobby(name)).toString())
-                        .build());
-    }
-
-    @GET
-    @Path("zip-code/{code}")
-    @Produces(APPLICATION_JSON)
-    public Response inZipCode(@PathParam("code") String code) throws Exception
-    {
-        return repository(repository ->
-                Response.ok()
-                        .entity(gson.toJson(toDTOs(repository.inZipCode(code))))
-                        .build());
-    }
-
-    @GET
-    @Path("city/{name: [a-zA-Z ]+}")
-    @Produces(APPLICATION_JSON)
-    public Response inCity(@PathParam("name") String name) throws Exception
-    {
-        return repository(repository ->
-                Response.ok()
-                        .entity(gson.toJson(toDTOs(repository.inCity(name))))
-                        .build());
-    }
-
-    @GET
-    @Path("city/{id: [0-9]+}")
-    @Produces(APPLICATION_JSON)
-    public Response inCity(@PathParam("id") int id) throws Exception
-    {
-        return repository(repository ->
-                Response.ok()
-                        .entity(gson.toJson(toDTOs(repository.inCity(id))))
-                        .build());
-    }
-
-    @DELETE
-    @Path("{id: [0-9]+}")
-    @Produces(APPLICATION_JSON)
-    public Response delete(@PathParam("id") int id) throws Exception
-    {
-        TransactionalPersonRepository personRepository = new TransactionalPersonRepository(emf);
-        try {
-            personRepository.begin();
-            Person person = personRepository.delete(id);
-            personRepository.commit();
-            if (person == null)
-                throw new PersonNotFoundException(id);
-
-            return Response.ok(gson.toJson(new PersonDTO(person))).build();
-        } finally {
-            personRepository.close();
-        }
-    }
-
-    private static JsonObject count(long count)
-    {
-        JsonObject o = new JsonObject();
-        o.addProperty("count", count);
-        return o;
-    }
-
-    @FunctionalInterface
-    private interface ExceptionFunction
-    {
-        public Response call(TransactionalPersonRepository repository) throws Exception;
-    }
-
-    private Response repository(ExceptionFunction f) throws Exception
-    {
-        TransactionalPersonRepository repository = new TransactionalPersonRepository(emf);
-        try {
-            return f.call(repository);
-        } finally {
-            repository.close();
-        }
-    }
-
-    private List<PersonDTO> toDTOs(List<Person> entities)
-    {
-        List<PersonDTO> result = new ArrayList<>();
-        for (Person person : entities)
-            result.add(new PersonDTO(person));
-
-        return result;
     }
 }

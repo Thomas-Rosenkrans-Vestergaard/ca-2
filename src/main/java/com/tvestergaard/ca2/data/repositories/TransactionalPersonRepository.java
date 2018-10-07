@@ -36,13 +36,15 @@ public class TransactionalPersonRepository extends TransactionalCrudRepository<P
         Person person = new Person(firstName, lastName, email);
         person.setAddress(address);
         person.setPhoneNumbers(phones);
+        for (Phone phone : phones)
+            phone.setOwner(person);
         return persist(person);
     }
 
     @Override public Person delete(Integer id)
     {
         EntityManager entityManager = this.getEntityManager();
-        Person             find          = entityManager.find(Person.class, id);
+        Person        find          = entityManager.find(Person.class, id);
         if (find == null)
             return null;
 
