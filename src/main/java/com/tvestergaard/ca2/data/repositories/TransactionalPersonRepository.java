@@ -8,6 +8,7 @@ import com.tvestergaard.ca2.data.entities.Phone;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,6 +50,7 @@ public class TransactionalPersonRepository extends TransactionalCrudRepository<P
             return null;
 
         find.setAddress(null);
+        find.setHobbies(new ArrayList<>());
         entityManager.remove(find);
         return find;
     }

@@ -6,6 +6,6 @@ public class CityNotFoundException extends APIException
 {
     public CityNotFoundException(Integer id)
     {
-        super(String.format("No city with provided id '%d'.", id), 404);
+        super(String.format("No city with provided id %d.", id), 404);
     }
 }

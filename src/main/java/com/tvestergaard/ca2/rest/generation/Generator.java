@@ -13,8 +13,8 @@ public class Generator
     public static void main(String[] args) throws Exception
     {
         generate(
-                200,
-                200,
+                300,
+                300,
                 new Distribution<Integer>().with(3, 1).with(2, 2).with(1, 3),
                 new Distribution<Integer>().with(3, 3).with(2, 2).with(1, 1),
                 new Distribution<Integer>().with(8, 1).with(3, 2).with(1, 3),

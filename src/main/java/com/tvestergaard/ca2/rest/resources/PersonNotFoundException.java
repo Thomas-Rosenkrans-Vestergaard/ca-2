@@ -7,6 +7,6 @@ public class PersonNotFoundException extends APIException
 
     public PersonNotFoundException(Integer id)
     {
-        super(String.format("No person with provided id '%d'.", id), 404);
+        super(String.format("No person with provided id %d.", id), 404);
     }
 }

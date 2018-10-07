@@ -48,7 +48,7 @@ public class CompanyResource
     }
 
     @GET
-    @Path("getPersonsCount")
+    @Path("count")
     @Produces(APPLICATION_JSON)
     public Response count() throws Exception
     {
@@ -80,7 +80,7 @@ public class CompanyResource
     private static JsonObject count(long count)
     {
         JsonObject o = new JsonObject();
-        o.addProperty("getPersonsCount", count);
+        o.addProperty("count", count);
         return o;
     }
 

@@ -59,7 +59,7 @@ public class PersonResource
     @GET
     @Path("street/{street: .*}/city/{city: [0-9]*}")
     @Produces(APPLICATION_JSON)
-    public Response getPersonsByLocation(@PathParam("street") String street, @PathParam("city") int city) throws Exception
+    public Response getPersonsByAddress(@PathParam("street") String street, @PathParam("city") int city) throws Exception
     {
         String  s = street.isEmpty() ? null : street;
         Integer c = city == 0 ? null : city;
@@ -321,12 +321,13 @@ public class PersonResource
         TransactionalPersonRepository personRepository = new TransactionalPersonRepository(emf);
         try {
             personRepository.begin();
-            Person person = personRepository.delete(id);
+            Person    person    = personRepository.delete(id);
+            PersonDTO personDTO = new PersonDTO(person);
             personRepository.commit();
             if (person == null)
                 throw new PersonNotFoundException(id);
 
-            return Response.ok(gson.toJson(new PersonDTO(person))).build();
+            return Response.ok(gson.toJson(personDTO)).build();
         } finally {
             personRepository.close();
         }
@@ -335,7 +336,7 @@ public class PersonResource
     private static JsonObject count(long count)
     {
         JsonObject o = new JsonObject();
-        o.addProperty("getPersonsCount", count);
+        o.addProperty("count", count);
         return o;
     }
 

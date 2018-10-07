@@ -17,7 +17,7 @@ public class Person extends InfoEntity
     @Column(length = 255, nullable = false)
     private String lastName;
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "persons")
+    @ManyToMany(mappedBy = "persons", cascade = CascadeType.REMOVE)
     private List<Hobby> hobbies = new ArrayList<>();
 
     public Person()
