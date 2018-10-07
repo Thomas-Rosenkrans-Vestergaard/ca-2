@@ -249,7 +249,7 @@ public class PersonResource
                     postedPerson.address.information,
                     city);
             List<Phone> phoneNumbers = new ArrayList<>();
-            for (PostPhone postPhone : postedPerson.phones)
+            for (PostedPhone postPhone : postedPerson.phones)
                 phoneNumbers.add(new Phone(postPhone.number, postPhone.description));
             Person person = repository.create(postedPerson.firstName, postedPerson.lastName, postedPerson.email,
                     address,
@@ -275,9 +275,9 @@ public class PersonResource
     @Produces(APPLICATION_JSON)
     public Response updatePerson(@PathParam("id") int id, String received) throws Exception
     {
-        PutPerson                 putPerson            = gson.fromJson(received, PutPerson.class);
+        PostedPerson              postedPerson         = gson.fromJson(received, PostedPerson.class);
         Validator                 validator            = new Validator();
-        List<ConstraintViolation> constraintViolations = validator.validate(putPerson);
+        List<ConstraintViolation> constraintViolations = validator.validate(postedPerson);
         if (!constraintViolations.isEmpty())
             throw new ValidationException("Could not validate submitted person.", constraintViolations);
 
@@ -286,16 +286,16 @@ public class PersonResource
         TransactionalCityRepository    cityRepository    = new TransactionalCityRepository(repository.getEntityManager());
         try {
             repository.begin();
-            City city = cityRepository.get(putPerson.address.city);
+            City city = cityRepository.get(postedPerson.address.city);
             if (city == null)
-                throw new CityNotFoundException(putPerson.address.city);
-            Address address = addressRepository.getOrCreate(putPerson.address.street,
-                    putPerson.address.information,
+                throw new CityNotFoundException(postedPerson.address.city);
+            Address address = addressRepository.getOrCreate(postedPerson.address.street,
+                    postedPerson.address.information,
                     city);
             List<Phone> phoneNumbers = new ArrayList<>();
-            for (PutPhone putPhone : putPerson.phones)
-                phoneNumbers.add(new Phone(putPhone.number, putPhone.description));
-            Person person = repository.update(id, putPerson.firstName, putPerson.lastName, putPerson.email,
+            for (PostedPhone postedPhone : postedPerson.phones)
+                phoneNumbers.add(new Phone(postedPhone.number, postedPhone.description));
+            Person person = repository.update(id, postedPerson.firstName, postedPerson.lastName, postedPerson.email,
                     address,
                     phoneNumbers);
             repository.commit();
@@ -406,18 +406,10 @@ public class PersonResource
 
         @AssertValid
         @NotNull
-        public List<PostPhone> phones;
+        public List<PostedPhone> phones;
     }
 
-    private static class PutPerson extends ReceivedPerson
-    {
-
-        @AssertValid
-        @NotNull
-        public List<PutPhone> phones;
-    }
-
-    private static class PostPhone
+    private static class PostedPhone
     {
 
         @NotNull
@@ -427,13 +419,5 @@ public class PersonResource
         @NotNull
         @Length(min = 1, max = 255)
         public String description;
-    }
-
-    private static class PutPhone extends PostPhone
-    {
-
-        @NotNull
-        @Size(min = 0)
-        public Integer id;
     }
 }

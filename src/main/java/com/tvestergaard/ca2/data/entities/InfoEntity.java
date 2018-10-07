@@ -16,7 +16,7 @@ public abstract class InfoEntity
     @Column(length = 255, nullable = false, unique = true)
     protected String email;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "owner", cascade = {CascadeType.ALL})
     protected List<Phone> phoneNumbers = new ArrayList<>();
 
     @ManyToOne(cascade = {CascadeType.REMOVE})

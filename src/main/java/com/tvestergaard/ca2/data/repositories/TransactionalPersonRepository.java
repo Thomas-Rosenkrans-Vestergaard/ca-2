@@ -84,7 +84,12 @@ public class TransactionalPersonRepository extends TransactionalCrudRepository<P
         person.setLastName(lastName);
         person.setEmail(email);
         person.setAddress(address);
-        person.setPhoneNumbers(phones);
+        person.getPhoneNumbers().clear();
+        for(Phone phone : phones) {
+            phone.setOwner(person);
+            person.getPhoneNumbers().add(phone);
+        }
+
         entityManager.merge(person);
 
         return person;
