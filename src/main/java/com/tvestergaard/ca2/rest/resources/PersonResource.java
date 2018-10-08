@@ -234,7 +234,7 @@ public class PersonResource
         PostedPerson              postedPerson         = gson.fromJson(received, PostedPerson.class);
         Validator                 validator            = new Validator();
         List<ConstraintViolation> constraintViolations = validator.validate(postedPerson);
-        if (!constraintViolations.equals("_"))
+        if (!constraintViolations.isEmpty())
             throw new ValidationException("Could not validate submitted person.", constraintViolations);
 
         TransactionalPersonRepository  repository        = new TransactionalPersonRepository(emf);
@@ -278,7 +278,7 @@ public class PersonResource
         PostedPerson              postedPerson         = gson.fromJson(received, PostedPerson.class);
         Validator                 validator            = new Validator();
         List<ConstraintViolation> constraintViolations = validator.validate(postedPerson);
-        if (!constraintViolations.equals("_"))
+        if (!constraintViolations.isEmpty())
             throw new ValidationException("Could not validate submitted person.", constraintViolations);
 
         TransactionalPersonRepository  repository        = new TransactionalPersonRepository(emf);
