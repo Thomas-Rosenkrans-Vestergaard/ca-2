@@ -66,7 +66,9 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
 
         public ConstraintViolationDTO(ConstraintViolation parent, ConstraintViolation cause)
         {
-            this.message = cause.getMessage();
+
+            String message = cause.getMessage();
+            this.message = getAttributeName(parent) + "." + getAttributeName(cause)  + message.substring(message.indexOf(" "));
             this.checkName = cause.getCheckName().substring(cause.getCheckName().lastIndexOf(".") + 1);
             this.variables = getVariables(cause);
             if (cause.getContext() instanceof FieldContext) {
@@ -77,7 +79,9 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
 
         public ConstraintViolationDTO(ConstraintViolation constraintViolation)
         {
-            this.message = constraintViolation.getMessage();
+            String message = constraintViolation.getMessage();
+
+            this.message = getAttributeName(constraintViolation) + message.substring(message.indexOf(" "));
             this.checkName = constraintViolation.getCheckName().substring(constraintViolation.getCheckName().lastIndexOf(".") + 1);
             this.variables = getVariables(constraintViolation);
             this.invalidValue = String.valueOf(constraintViolation.getInvalidValue());
