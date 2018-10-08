@@ -9,7 +9,8 @@ import java.io.IOException;
 
 @Provider
 @PreMatching
-public class CorsResponseFilter implements ContainerResponseFilter
+public class
+CorsResponseFilter implements ContainerResponseFilter
 {
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException

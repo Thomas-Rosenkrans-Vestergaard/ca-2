@@ -365,7 +365,22 @@ public class PersonResource
         return result;
     }
 
-    private static class ReceivedPerson
+    private static class ReceivedAddress
+    {
+
+        @NotNull
+        @Length(min = 1, max = 255)
+        public String street;
+
+        @NotNull
+        @Length(min = 1, max = 255)
+        public String information;
+
+        @Size(min = 1)
+        public int city;
+    }
+
+    private static class PostedPerson
     {
 
         @NotNull
@@ -384,25 +399,6 @@ public class PersonResource
         @AssertValid
         @NotNull
         public ReceivedAddress address;
-    }
-
-    private static class ReceivedAddress
-    {
-
-        @NotNull
-        @Length(min = 1, max = 255)
-        public String street;
-
-        @NotNull
-        @Length(min = 1, max = 255)
-        public String information;
-
-        @Size(min = 1)
-        public int city;
-    }
-
-    private static class PostedPerson extends ReceivedPerson
-    {
 
         @AssertValid
         @NotNull
