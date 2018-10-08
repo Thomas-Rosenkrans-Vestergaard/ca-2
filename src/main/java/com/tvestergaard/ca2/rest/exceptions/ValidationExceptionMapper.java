@@ -38,7 +38,7 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
         for (ConstraintViolation constraintViolation : exception.constraintViolations) {
             if (constraintViolation.getCauses() != null) {
                 for (ConstraintViolation cause : constraintViolation.getCauses())
-                    exceptionResponse.violations.add(new ConstraintViolationDTO(cause));
+                    exceptionResponse.violations.add(new ConstraintViolationDTO(constraintViolation, cause));
             } else
                 exceptionResponse.violations.add(new ConstraintViolationDTO(constraintViolation));
         }
@@ -48,8 +48,8 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
 
     private class ExceptionResponse
     {
-        public String                       exception;
-        public String                       message;
+        public String exception;
+        public String message;
 
         public Integer                      responseCode;
         public Boolean                      debug;
@@ -64,36 +64,54 @@ public class ValidationExceptionMapper implements ExceptionMapper<ValidationExce
         public String     invalidValue;
         public JsonObject variables;
 
-        public ConstraintViolationDTO(ConstraintViolation constraintViolation)
+        public ConstraintViolationDTO(ConstraintViolation parent, ConstraintViolation cause)
         {
-
-            String checkName = constraintViolation.getCheckName();
-
-            this.message = constraintViolation.getMessage();
-            this.checkName = checkName.substring(checkName.lastIndexOf(".") + 1);
-            if (constraintViolation.getContext() instanceof FieldContext)
-                attribute = ((FieldContext) constraintViolation.getContext()).getField().getName();
-            try {
-                this.invalidValue = String.valueOf(constraintViolation.getInvalidValue());
-            } catch (Exception e) {
-                this.invalidValue = "// Could not serialize value.";
-            }
-
-            Map<String, ? extends Serializable> variables = constraintViolation.getMessageVariables();
-            if (variables != null && !variables.isEmpty()) {
-                this.variables = new JsonObject();
-                for (Map.Entry<String, ? extends Serializable> entry : variables.entrySet()) {
-                    String key = entry.getKey();
-                    Object val = entry.getValue();
-
-                    if (val instanceof String)
-                        this.variables.addProperty(key, (String) val);
-                    else if (val instanceof Number)
-                        this.variables.addProperty(key, (Number) val);
-                    else if (val instanceof Boolean)
-                        this.variables.addProperty(key, (Boolean) val);
-                }
+            this.message = cause.getMessage();
+            this.checkName = cause.getCheckName().substring(cause.getCheckName().lastIndexOf(".") + 1);
+            this.variables = getVariables(cause);
+            if (cause.getContext() instanceof FieldContext) {
+                this.attribute = String.format("%s.%s", getAttributeName(parent), getAttributeName(cause));
+                this.invalidValue = String.valueOf(cause.getInvalidValue());
             }
         }
+
+        public ConstraintViolationDTO(ConstraintViolation constraintViolation)
+        {
+            this.message = constraintViolation.getMessage();
+            this.checkName = constraintViolation.getCheckName().substring(constraintViolation.getCheckName().lastIndexOf(".") + 1);
+            this.variables = getVariables(constraintViolation);
+            this.invalidValue = String.valueOf(constraintViolation.getInvalidValue());
+            if (constraintViolation.getContext() instanceof FieldContext)
+                attribute = getAttributeName(constraintViolation);
+        }
+    }
+
+    private String getAttributeName(ConstraintViolation constraintViolation)
+    {
+        FieldContext fieldContext = (FieldContext) constraintViolation.getContext();
+
+        return fieldContext.getField().getName();
+    }
+
+    private JsonObject getVariables(ConstraintViolation constraintViolation)
+    {
+
+        JsonObject result = new JsonObject();
+        Map<String, ? extends Serializable> variablesMap = constraintViolation.getMessageVariables();
+        if (variablesMap != null && !variablesMap.isEmpty()) {
+            for (Map.Entry<String, ? extends Serializable> entry : variablesMap.entrySet()) {
+                String key = entry.getKey();
+                Object val = entry.getValue();
+
+                if (val instanceof String)
+                    result.addProperty(key, (String) val);
+                else if (val instanceof Number)
+                    result.addProperty(key, (Number) val);
+                else if (val instanceof Boolean)
+                    result.addProperty(key, (Boolean) val);
+            }
+        }
+
+        return result;
     }
 }
